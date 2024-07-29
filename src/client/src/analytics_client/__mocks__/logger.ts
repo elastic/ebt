@@ -14,6 +14,7 @@ const createLoggerMock = (context: string[] = []) => {
   const mockLog: MockedLogger = {
     context,
     debug: jest.fn(),
+    info: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
     get: jest.fn(),
@@ -28,6 +29,7 @@ const createLoggerMock = (context: string[] = []) => {
 
 const clearLoggerMock = (logger: MockedLogger) => {
   logger.debug.mockClear();
+  logger.info.mockClear();
   logger.warn.mockClear();
   logger.error.mockClear();
 };
@@ -59,6 +61,7 @@ const convertMessageSourceOrError = (
 const collectLoggerMock = (logger: MockedLogger) => {
   return {
     debug: logger.debug.mock.calls.map(convertMessageSource),
+    info: logger.info.mock.calls.map(convertMessageSource),
     error: logger.error.mock.calls.map(convertMessageSourceOrError),
     warn: logger.warn.mock.calls.map(convertMessageSourceOrError),
   };
