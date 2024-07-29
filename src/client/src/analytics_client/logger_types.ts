@@ -25,10 +25,17 @@ export interface Logger {
    * @param message - The log message, or a function returning the log message
    * @param meta - The ECS meta to attach to the log entry
    *
-   * @remark If a function is provided for the message, it will only be evaluated if the logger's level is high enough for this level.
-   *         This can be used as an alternative to {@link Logger.isLevelEnabled} to wrap expensive logging operations into a conditional blocks.
    */
   debug(message: LogMessageSource, meta?: Record<EventType, unknown>): void;
+
+  /**
+   * Logs messages related to general application flow
+   *
+   * @param message - The log message, or a function returning the log message
+   * @param meta - The ECS meta to attach to the log entry
+   *
+   */
+  info(message: LogMessageSource, meta?: Record<EventType, unknown>): void;
 
   /**
    * Logs abnormal or unexpected errors or messages
@@ -36,11 +43,16 @@ export interface Logger {
    * @param errorOrMessage - An Error object, message string, or function returning the log message
    * @param meta - The ECS meta to attach to the log entry
    *
-   * @remark If a function is provided for the message, it will only be evaluated if the logger's level is high enough for this level.
-   *         This can be used as an alternative to {@link Logger.isLevelEnabled} to wrap expensive logging operations into a conditional blocks.
    */
   warn(errorOrMessage: LogMessageSource | Error, meta?: Record<EventType, unknown>): void;
 
+  /**
+   * Logs abnormal or unexpected errors or messages that caused a failure in the application flow
+   *
+   * @param errorOrMessage - An Error object, message string, or function returning the log message
+   * @param meta - The ECS meta to attach to the log entry
+   *
+   */
   error(
     errorOrMessage: LogMessageSource | Error,
     meta?: Record<EventType, unknown>
