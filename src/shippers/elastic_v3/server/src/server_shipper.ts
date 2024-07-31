@@ -102,7 +102,6 @@ export class ElasticV3ServerShipper implements IShipper {
     }
     this.buildHeaders = options.buildShipperHeaders;
     this.url = options.buildShipperUrl({
-      sendTo: options.sendTo ?? initContext.sendTo,
       channelName: options.channelName,
     });
     this.setInternalSubscriber();

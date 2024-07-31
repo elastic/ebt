@@ -1,11 +1,8 @@
 import { BuildShipperHeaders, BuildShipperUrl, BuildShipperUrlOptions } from "../types";
 
 export const buildShipperUrl: BuildShipperUrl = (urlOptions: BuildShipperUrlOptions): string => {
-  const { sendTo, channelName } = urlOptions;
-  const baseUrl =
-    sendTo === 'production'
-      ? 'https://telemetry.elastic.co'
-      : 'https://telemetry-staging.elastic.co';
+  const { channelName } = urlOptions;
+  const baseUrl = 'https://telemetry-staging.elastic.co';
   return `${baseUrl}/v3/send/${channelName}`;
 }
 
