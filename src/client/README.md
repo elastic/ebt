@@ -13,8 +13,6 @@ const analytics = createAnalytics({
   // Set to `true` when running in developer mode.
   // It enables development helpers like schema validation and extra debugging features.
   isDev: false,
-  // Set to `staging` if you don't want your events to be sent to the production cluster. Useful for CI & QA environments.
-  sendTo: 'production',
   // The application's instrumented logger 
   logger,
 });

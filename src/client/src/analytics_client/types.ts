@@ -25,10 +25,6 @@ export interface AnalyticsClientInitContext {
    */
   isDev: boolean;
   /**
-   * Specify if the shippers should send their data to the production or staging environments.
-   */
-  sendTo: 'production' | 'staging';
-  /**
    * Application-provided logger.
    */
   logger: Logger;

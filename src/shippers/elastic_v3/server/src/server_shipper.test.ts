@@ -27,7 +27,6 @@ describe('ElasticV3ServerShipper', () => {
   ];
 
   const initContext: AnalyticsClientInitContext = {
-    sendTo: 'staging',
     isDev: true,
     logger: loggerMock.create(),
   };

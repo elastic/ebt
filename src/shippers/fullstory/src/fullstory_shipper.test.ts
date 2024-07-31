@@ -22,7 +22,6 @@ describe('FullStoryShipper', () => {
       },
       {
         logger: loggerMock.create(),
-        sendTo: 'staging',
         isDev: true,
       }
     );
@@ -190,7 +189,6 @@ describe('FullStoryShipper', () => {
         },
         {
           logger: loggerMock.create(),
-          sendTo: 'staging',
           isDev: true,
         }
       );

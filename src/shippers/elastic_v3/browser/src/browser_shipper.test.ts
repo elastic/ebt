@@ -23,7 +23,6 @@ describe('ElasticV3BrowserShipper', () => {
   ];
 
   const initContext: AnalyticsClientInitContext = {
-    sendTo: 'staging',
     isDev: true,
     logger: loggerMock.create(),
   };
@@ -55,16 +54,6 @@ describe('ElasticV3BrowserShipper', () => {
   afterEach(() => {
     shipper.shutdown();
     jest.useRealTimers();
-  });
-
-  test("custom sendTo overrides Analytics client's", () => {
-    const prodShipper = new ElasticV3BrowserShipper(
-      { version: '1.2.3', channelName: 'test-channel', debug: true, sendTo: 'production', buildShipperHeaders, buildShipperUrl },
-      initContext
-    );
-
-    // eslint-disable-next-line dot-notation
-    expect(prodShipper['url']).not.toEqual(shipper['url']);
   });
 
   test('set optIn should update the isOptedIn$ observable', () => {

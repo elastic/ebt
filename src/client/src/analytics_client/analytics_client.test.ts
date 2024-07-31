@@ -24,7 +24,6 @@ describe('AnalyticsClient', () => {
     analyticsClient = new AnalyticsClient({
       logger,
       isDev: true,
-      sendTo: 'staging',
     });
   });
 

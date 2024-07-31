@@ -70,7 +70,6 @@ export class ElasticV3BrowserShipper implements IShipper {
     }
     this.buildHeaders = options.buildShipperHeaders;
     this.url = options.buildShipperUrl({
-      sendTo: options.sendTo ?? initContext.sendTo,
       channelName: options.channelName,
     });
   }

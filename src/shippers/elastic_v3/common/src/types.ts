@@ -19,10 +19,6 @@ export interface ElasticV3ShipperOptions {
    */
   version: string;
   /**
-   * Provide it to override the Analytics client's default configuration.
-   */
-  sendTo?: 'staging' | 'production';
-  /**
    * Should show debug information about the requests it makes to the V3 API.
    */
   debug?: boolean;
@@ -41,8 +37,6 @@ export type BuildShipperHeaders = (clusterUuid: string, version: string, license
 
 /** The options to build the URL of the V3 API. */
 export interface BuildShipperUrlOptions {
-  /** Whether to send it to production or staging. */
-  sendTo: 'production' | 'staging';
   /** The name of the channel to send the data to. */
   channelName: string;
 }
