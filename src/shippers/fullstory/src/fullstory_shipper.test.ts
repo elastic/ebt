@@ -6,11 +6,11 @@
  * Side Public License, v 1.
  */
 
-import { loggerMock } from '../../../client/src/analytics_client/__mocks__/logger';
-import { fullStoryApiMock } from './fullstory_shipper.test.mocks';
-import { FullStoryShipper } from './fullstory_shipper';
+import { loggerMock } from "../../../client/src/analytics_client/__mocks__/logger";
+import { fullStoryApiMock } from "./fullstory_shipper.test.mocks";
+import { FullStoryShipper } from "./fullstory_shipper";
 
-describe('FullStoryShipper', () => {
+describe("FullStoryShipper", () => {
   let fullstoryShipper: FullStoryShipper;
 
   beforeEach(() => {
@@ -18,12 +18,12 @@ describe('FullStoryShipper', () => {
     fullstoryShipper = new FullStoryShipper(
       {
         debug: true,
-        fullStoryOrgId: 'test-org-id',
+        fullStoryOrgId: "test-org-id",
       },
       {
         logger: loggerMock.create(),
         isDev: true,
-      }
+      },
     );
   });
 
@@ -31,194 +31,294 @@ describe('FullStoryShipper', () => {
     fullstoryShipper.shutdown();
   });
 
-  describe('extendContext', () => {
-    describe('FS.identify', () => {
-      test('calls `identify` when the userId is provided', () => {
-        const userId = 'test-user-id';
+  describe("extendContext", () => {
+    describe("FS('setIdentity')", () => {
+      test("calls `setIdentity` when the userId is provided", () => {
+        const userId = "test-user-id";
         fullstoryShipper.extendContext({ userId });
-        expect(fullStoryApiMock.identify).toHaveBeenCalledWith(userId);
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setIdentity", {
+          uid: userId,
+        });
       });
 
-      test('calls `identify` again only if the userId changes', () => {
-        const userId = 'test-user-id';
+      test("calls `setIdentity` again only if the userId changes", () => {
+        const userId = "test-user-id";
         fullstoryShipper.extendContext({ userId });
-        expect(fullStoryApiMock.identify).toHaveBeenCalledTimes(1);
-        expect(fullStoryApiMock.identify).toHaveBeenCalledWith(userId);
+        expect(fullStoryApiMock).toHaveBeenCalledTimes(1);
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setIdentity", {
+          uid: userId,
+        });
 
         fullstoryShipper.extendContext({ userId });
-        expect(fullStoryApiMock.identify).toHaveBeenCalledTimes(1); // still only called once
+        expect(fullStoryApiMock).toHaveBeenCalledTimes(1); // still only called once
 
         fullstoryShipper.extendContext({ userId: `${userId}-1` });
-        expect(fullStoryApiMock.identify).toHaveBeenCalledTimes(2); // called again because the user changed
-        expect(fullStoryApiMock.identify).toHaveBeenCalledWith(`${userId}-1`);
+        expect(fullStoryApiMock).toHaveBeenCalledTimes(2); // called again because the user changed
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setIdentity", {
+          uid: `${userId}-1`,
+        });
       });
     });
 
-    describe('FS.setUserVars', () => {
-      test('calls `setUserVars` when isElasticCloudUser: true is provided', () => {
+    describe("FS('setProperties', { type: 'user' })", () => {
+      test("calls `setProperties/user` when isElasticCloudUser: true is provided", () => {
         fullstoryShipper.extendContext({ isElasticCloudUser: true });
-        expect(fullStoryApiMock.setUserVars).toHaveBeenCalledWith({
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          isElasticCloudUser_bool: true,
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "user",
+          properties: {
+            isElasticCloudUser: true,
+          },
+          schema: {
+            properties: {
+              isElasticCloudUser: "bool",
+            },
+          },
         });
       });
 
-      test('calls `setUserVars` when isElasticCloudUser: false is provided', () => {
+      test("calls `setProperties/user` when isElasticCloudUser: false is provided", () => {
         fullstoryShipper.extendContext({ isElasticCloudUser: false });
-        expect(fullStoryApiMock.setUserVars).toHaveBeenCalledWith({
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          isElasticCloudUser_bool: false,
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "user",
+          properties: {
+            isElasticCloudUser: false,
+          },
+          schema: {
+            properties: {
+              isElasticCloudUser: "bool",
+            },
+          },
         });
       });
     });
 
-    describe('FS.setVars', () => {
-      test('calls `setVars` when version is provided', () => {
-        fullstoryShipper.extendContext({ version: '1.2.3' });
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledWith('page', {
-          version_str: '1.2.3',
-          version_major_int: 1,
-          version_minor_int: 2,
-          version_patch_int: 3,
+    describe("FS('setProperties', { type: 'page' })", () => {
+      test("calls `setProperties/page` when version is provided", () => {
+        fullstoryShipper.extendContext({ version: "1.2.3" });
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "page",
+          properties: {
+            version: "1.2.3",
+            version_major: 1,
+            version_minor: 2,
+            version_patch: 3,
+          },
+          schema: {
+            properties: {
+              version: "str",
+              version_major: "int",
+              version_minor: "int",
+              version_patch: "int",
+            },
+          },
         });
       });
 
-      test('calls `setVars` when cloudId is provided', () => {
-        fullstoryShipper.extendContext({ cloudId: 'test-es-org-id' });
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledWith('page', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          cloudId_str: 'test-es-org-id',
+      test("calls `setProperties/page` when cloudId is provided", () => {
+        fullstoryShipper.extendContext({ cloudId: "test-es-org-id" });
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "page",
+          properties: {
+            cloudId: "test-es-org-id",
+          },
+          schema: {
+            properties: {
+              cloudId: "str",
+            },
+          },
         });
       });
 
-      test('merges both: version and cloudId if both are provided', () => {
-        fullstoryShipper.extendContext({ version: '1.2.3', cloudId: 'test-es-org-id' });
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledWith('page', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          cloudId_str: 'test-es-org-id',
-          version_str: '1.2.3',
-          version_major_int: 1,
-          version_minor_int: 2,
-          version_patch_int: 3,
+      test("merges both: version and cloudId if both are provided", () => {
+        fullstoryShipper.extendContext({
+          version: "1.2.3",
+          cloudId: "test-es-org-id",
+        });
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "page",
+          properties: {
+            version: "1.2.3",
+            version_major: 1,
+            version_minor: 2,
+            version_patch: 3,
+            cloudId: "test-es-org-id",
+          },
+          schema: {
+            properties: {
+              cloudId: "str",
+              version: "str",
+              version_major: "int",
+              version_minor: "int",
+              version_patch: "int",
+            },
+          },
         });
       });
 
-      test('adds the rest of the context to `setVars` (only if they match one of the valid keys)', () => {
+      test("adds the rest of the context to `setProperties/page` (only if they match one of the valid keys)", () => {
         const context = {
-          userId: 'test-user-id',
-          version: '1.2.3',
-          cloudId: 'test-es-org-id',
-          labels: { serverless: 'test' },
-          foo: 'bar',
+          userId: "test-user-id",
+          version: "1.2.3",
+          cloudId: "test-es-org-id",
+          labels: { serverless: "test" },
+          foo: "bar",
         };
         fullstoryShipper.extendContext(context);
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledWith('page', {
-          version_str: '1.2.3',
-          version_major_int: 1,
-          version_minor_int: 2,
-          version_patch_int: 3,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          cloudId_str: 'test-es-org-id',
-          labels: { serverless_str: 'test' },
+        expect(fullStoryApiMock).toHaveBeenCalledWith("setProperties", {
+          type: "page",
+          properties: {
+            version: "1.2.3",
+            version_major: 1,
+            version_minor: 2,
+            version_patch: 3,
+            cloudId: "test-es-org-id",
+            labels: { serverless: "test" },
+          },
+          schema: {
+            properties: {
+              version: "str",
+              version_major: "int",
+              version_minor: "int",
+              version_patch: "int",
+              cloudId: "str",
+              labels: { serverless: "str" },
+            },
+          },
         });
       });
 
-      test('emits once only if nothing changes', () => {
+      test("emits once only if nothing changes", () => {
         const context = {
-          userId: 'test-user-id',
-          version: '1.2.3',
-          cloudId: 'test-es-org-id',
-          labels: { serverless: 'test' },
-          foo: 'bar',
+          userId: "test-user-id",
+          version: "1.2.3",
+          cloudId: "test-es-org-id",
+          labels: { serverless: "test" },
+          foo: "bar",
         };
         fullstoryShipper.extendContext(context);
         fullstoryShipper.extendContext(context);
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledTimes(1);
+        expect(fullStoryApiMock).toHaveBeenCalledTimes(2); // 2: userId => setIdentity + rest => setProperties
         fullstoryShipper.extendContext(context);
-        expect(fullStoryApiMock.setVars).toHaveBeenCalledTimes(1);
+        expect(fullStoryApiMock).toHaveBeenCalledTimes(2);
       });
     });
   });
 
-  describe('optIn', () => {
-    test('should call consent true and restart when isOptIn: true', () => {
+  describe("optIn", () => {
+    test("should call consent true and restart when isOptIn: true", () => {
       fullstoryShipper.optIn(true);
-      expect(fullStoryApiMock.consent).toHaveBeenCalledWith(true);
-      expect(fullStoryApiMock.restart).toHaveBeenCalled();
+      expect(fullStoryApiMock).toHaveBeenCalledWith("setIdentity", {
+        consent: true,
+      });
+      expect(fullStoryApiMock).toHaveBeenCalledWith("restart");
     });
 
-    test('should call consent false and shutdown when isOptIn: false', () => {
+    test("should call consent false and shutdown when isOptIn: false", () => {
       fullstoryShipper.optIn(false);
-      expect(fullStoryApiMock.consent).toHaveBeenCalledWith(false);
-      expect(fullStoryApiMock.shutdown).toHaveBeenCalled();
+      expect(fullStoryApiMock).toHaveBeenCalledWith("setIdentity", {
+        consent: false,
+      });
+      expect(fullStoryApiMock).toHaveBeenCalledWith("shutdown");
     });
   });
 
-  describe('reportEvents', () => {
-    test('calls the API once per event in the array with the properties transformed', () => {
+  describe("reportEvents", () => {
+    test("calls the API once per event in the array with the properties transformed", () => {
       fullstoryShipper.reportEvents([
         {
-          event_type: 'test-event-1',
-          timestamp: '2020-01-01T00:00:00.000Z',
-          properties: { test: 'test-1' },
-          context: { pageName: 'test-page-1' },
+          event_type: "test-event-1",
+          timestamp: "2020-01-01T00:00:00.000Z",
+          properties: { test: "test-1" },
+          context: { pageName: "test-page-1" },
         },
         {
-          event_type: 'test-event-2',
-          timestamp: '2020-01-01T00:00:00.000Z',
-          properties: { other_property: 'test-2' },
-          context: { pageName: 'test-page-1' },
+          event_type: "test-event-2",
+          timestamp: "2020-01-01T00:00:00.000Z",
+          properties: { other_property: "test-2" },
+          context: { pageName: "test-page-1" },
         },
       ]);
 
-      expect(fullStoryApiMock.event).toHaveBeenCalledTimes(2);
-      expect(fullStoryApiMock.event).toHaveBeenCalledWith('test-event-1', {
-        test_str: 'test-1',
+      expect(fullStoryApiMock).toHaveBeenCalledTimes(2);
+      expect(fullStoryApiMock).toHaveBeenCalledWith("trackEvent", {
+        name: "test-event-1",
+        properties: {
+          test: "test-1",
+        },
+        schema: {
+          properties: {
+            test: "str",
+          },
+        },
       });
-      expect(fullStoryApiMock.event).toHaveBeenCalledWith('test-event-2', {
-        other_property_str: 'test-2',
+      expect(fullStoryApiMock).toHaveBeenCalledWith("trackEvent", {
+        name: "test-event-2",
+        properties: {
+          other_property: "test-2",
+        },
+        schema: {
+          properties: {
+            other_property: "str",
+          },
+        },
       });
     });
 
-    test('filters the events by the allow-list', () => {
+    test("filters the events by the allow-list", () => {
       fullstoryShipper = new FullStoryShipper(
         {
-          eventTypesAllowlist: ['valid-event-1', 'valid-event-2'],
+          eventTypesAllowlist: ["valid-event-1", "valid-event-2"],
           debug: true,
-          fullStoryOrgId: 'test-org-id',
+          fullStoryOrgId: "test-org-id",
         },
         {
           logger: loggerMock.create(),
           isDev: true,
-        }
+        },
       );
       fullstoryShipper.reportEvents([
         {
-          event_type: 'test-event-1', // Should be filtered out.
-          timestamp: '2020-01-01T00:00:00.000Z',
-          properties: { test: 'test-1' },
-          context: { pageName: 'test-page-1' },
+          event_type: "test-event-1", // Should be filtered out.
+          timestamp: "2020-01-01T00:00:00.000Z",
+          properties: { test: "test-1" },
+          context: { pageName: "test-page-1" },
         },
         {
-          event_type: 'valid-event-1',
-          timestamp: '2020-01-01T00:00:00.000Z',
-          properties: { test: 'test-1' },
-          context: { pageName: 'test-page-1' },
+          event_type: "valid-event-1",
+          timestamp: "2020-01-01T00:00:00.000Z",
+          properties: { test: "test-1" },
+          context: { pageName: "test-page-1" },
         },
         {
-          event_type: 'valid-event-2',
-          timestamp: '2020-01-01T00:00:00.000Z',
-          properties: { test: 'test-2' },
-          context: { pageName: 'test-page-1' },
+          event_type: "valid-event-2",
+          timestamp: "2020-01-01T00:00:00.000Z",
+          properties: { test: "test-2" },
+          context: { pageName: "test-page-1" },
         },
       ]);
 
-      expect(fullStoryApiMock.event).toHaveBeenCalledTimes(2);
-      expect(fullStoryApiMock.event).toHaveBeenCalledWith('valid-event-1', {
-        test_str: 'test-1',
+      expect(fullStoryApiMock).toHaveBeenCalledTimes(2);
+      expect(fullStoryApiMock).toHaveBeenCalledWith("trackEvent", {
+        name: "valid-event-1",
+        properties: {
+          test: "test-1",
+        },
+        schema: {
+          properties: {
+            test: "str",
+          },
+        },
       });
-      expect(fullStoryApiMock.event).toHaveBeenCalledWith('valid-event-2', {
-        test_str: 'test-2',
+      expect(fullStoryApiMock).toHaveBeenCalledWith("trackEvent", {
+        name: "valid-event-2",
+        properties: {
+          test: "test-2",
+        },
+        schema: {
+          properties: {
+            test: "str",
+          },
+        },
       });
     });
   });
