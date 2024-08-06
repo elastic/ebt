@@ -5,6 +5,7 @@
   "repository": "git@github.com:elastic/ebt.git",
   "license": "SSPL-1.0 OR Elastic License 2.0",
   "main": "target/index.js",
+  "packageManager": "yarn@1.22.21",
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean && rimraf client shippers",
