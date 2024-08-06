@@ -49,11 +49,7 @@ export class ShippersRegistry {
    * @param shipperName The unique name for the shipper.
    * @param shipper The initialized shipper.
    */
-  public addEventExclusiveShipper(
-    eventType: EventType,
-    shipperName: ShipperName,
-    shipper: IShipper
-  ) {
+  public addEventExclusiveShipper(eventType: EventType, shipperName: ShipperName, shipper: IShipper) {
     const eventExclusiveMap = this.eventTypeExclusiveShippers.get(eventType) || new Map();
     if (eventExclusiveMap.get(shipperName)) {
       throw new Error(`${shipperName} is already registered for event-type ${eventType}`);

@@ -6,24 +6,8 @@
  * Side Public License, v 1.
  */
 
-import {
-  BehaviorSubject,
-  interval,
-  Subject,
-  bufferWhen,
-  concatMap,
-  skipWhile,
-  firstValueFrom,
-  map,
-  merge,
-} from 'rxjs';
-import type {
-  AnalyticsClientInitContext,
-  Event,
-  EventContext,
-  IShipper,
-  TelemetryCounter,
-} from '../../../../client';
+import { BehaviorSubject, interval, Subject, bufferWhen, concatMap, skipWhile, firstValueFrom, map, merge } from 'rxjs';
+import type { AnalyticsClientInitContext, Event, EventContext, IShipper, TelemetryCounter } from '../../../../client';
 import { ElasticV3ShipperOptions, ErrorWithCode } from '../../common';
 import { BuildShipperHeaders, createTelemetryCounterHelper, eventsToNDJSON } from '../../common';
 
@@ -134,12 +118,7 @@ export class ElasticV3BrowserShipper implements IShipper {
     this.internalQueue$
       .pipe(
         // Buffer events for 1 second or until we have an optIn value
-        bufferWhen(() =>
-          merge(
-            this.flush$,
-            interval(1000).pipe(skipWhile(() => this.isOptedIn$.value === undefined))
-          )
-        ),
+        bufferWhen(() => merge(this.flush$, interval(1000).pipe(skipWhile(() => this.isOptedIn$.value === undefined)))),
         // Send events (one batch at a time)
         concatMap(async (events) => {
           // Only send if opted-in and there's anything to send
@@ -178,10 +157,7 @@ export class ElasticV3BrowserShipper implements IShipper {
     }
 
     if (!response.ok) {
-      throw new ErrorWithCode(
-        `${response.status} - ${await response.text()}`,
-        `${response.status}`
-      );
+      throw new ErrorWithCode(`${response.status} - ${await response.text()}`, `${response.status}`);
     }
 
     return `${response.status}`;

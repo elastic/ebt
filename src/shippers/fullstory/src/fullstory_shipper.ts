@@ -6,55 +6,43 @@
  * Side Public License, v 1.
  */
 
-import {
-  Subject,
-  distinct,
-  debounceTime,
-  map,
-  filter,
-  Subscription,
-} from "rxjs";
-import get from "lodash.get";
-import has from "lodash.has";
-import type {
-  AnalyticsClientInitContext,
-  EventContext,
-  Event,
-  IShipper,
-} from "../../../client";
-import type { FullStoryApi } from "./types";
-import type { FullStorySnippetConfig } from "./load_snippet";
-import { getPropertiesAndSchema } from "./get_properties_and_schema";
-import { loadSnippet } from "./load_snippet";
-import { getParsedVersion } from "./get_parsed_version";
+import { Subject, distinct, debounceTime, map, filter, Subscription } from 'rxjs';
+import get from 'lodash.get';
+import has from 'lodash.has';
+import type { AnalyticsClientInitContext, EventContext, Event, IShipper } from '../../../client';
+import type { FullStoryApi } from './types';
+import type { FullStorySnippetConfig } from './load_snippet';
+import { getPropertiesAndSchema } from './get_properties_and_schema';
+import { loadSnippet } from './load_snippet';
+import { getParsedVersion } from './get_parsed_version';
 
 const PAGE_VARS_KEYS = [
   // Page-specific keys
-  "pageName",
-  "page",
-  "entityId",
-  "applicationId",
+  'pageName',
+  'page',
+  'entityId',
+  'applicationId',
 
   // Deployment-specific keys
-  "version", // x4, split to version_major, version_minor, version_patch for easier filtering
-  "buildSha", // Useful for Serverless
-  "cloudId",
-  "deploymentId",
-  "projectId", // projectId and deploymentId are mutually exclusive. They shouldn't be sent in the same offering.
-  "cluster_name",
-  "cluster_uuid",
-  "cluster_version",
-  "license_id",
-  "license_status",
-  "license_type",
+  'version', // x4, split to version_major, version_minor, version_patch for easier filtering
+  'buildSha', // Useful for Serverless
+  'cloudId',
+  'deploymentId',
+  'projectId', // projectId and deploymentId are mutually exclusive. They shouldn't be sent in the same offering.
+  'cluster_name',
+  'cluster_uuid',
+  'cluster_version',
+  'license_id',
+  'license_status',
+  'license_type',
 
   // Session-specific
-  "session_id",
-  "preferred_languages",
+  'session_id',
+  'preferred_languages',
 ] as const;
 
 // `labels` object keys from page vars.
-const PAGE_VARS_LABELS_KEYS = ["serverless"] as const;
+const PAGE_VARS_LABELS_KEYS = ['serverless'] as const;
 
 /**
  * FullStory shipper configuration.
@@ -79,8 +67,7 @@ interface FullStoryUserVars {
   cloudTrialEndDate?: string;
 }
 
-interface FullStoryPageContext
-  extends Pick<EventContext, (typeof PAGE_VARS_KEYS)[number]> {
+interface FullStoryPageContext extends Pick<EventContext, (typeof PAGE_VARS_KEYS)[number]> {
   labels: {
     [Key in (typeof PAGE_VARS_LABELS_KEYS)[number]]: unknown;
   };
@@ -91,7 +78,7 @@ interface FullStoryPageContext
  */
 export class FullStoryShipper implements IShipper {
   /** Shipper's unique name */
-  public static shipperName = "FullStory";
+  public static shipperName = 'FullStory';
 
   private readonly fullStoryApi: FullStoryApi;
   private lastUserId: string | undefined;
@@ -107,35 +94,20 @@ export class FullStoryShipper implements IShipper {
    */
   constructor(
     config: FullStoryShipperConfig,
-    private readonly initContext: AnalyticsClientInitContext,
+    private readonly initContext: AnalyticsClientInitContext
   ) {
-    const {
-      eventTypesAllowlist,
-      pageVarsDebounceTimeMs = 500,
-      ...snippetConfig
-    } = config;
+    const { eventTypesAllowlist, pageVarsDebounceTimeMs = 500, ...snippetConfig } = config;
     this.fullStoryApi = loadSnippet(snippetConfig);
     this.eventTypesAllowlist = eventTypesAllowlist;
 
     this.subscriptions.add(
       this.userContext$
         .pipe(
-          distinct(
-            ({
-              userId,
-              isElasticCloudUser,
-              cloudIsElasticStaffOwned,
-              cloudTrialEndDate,
-            }) =>
-              [
-                userId,
-                isElasticCloudUser,
-                cloudIsElasticStaffOwned,
-                cloudTrialEndDate,
-              ].join("-"),
-          ),
+          distinct(({ userId, isElasticCloudUser, cloudIsElasticStaffOwned, cloudTrialEndDate }) =>
+            [userId, isElasticCloudUser, cloudIsElasticStaffOwned, cloudTrialEndDate].join('-')
+          )
         )
-        .subscribe((userVars) => this.updateUserVars(userVars)),
+        .subscribe((userVars) => this.updateUserVars(userVars))
     );
 
     this.subscriptions.add(
@@ -153,7 +125,7 @@ export class FullStoryShipper implements IShipper {
                 }
                 return acc;
               },
-              {} as Record<string, unknown>,
+              {} as Record<string, unknown>
             );
 
             const pageLabelsVars = PAGE_VARS_LABELS_KEYS.reduce(
@@ -165,7 +137,7 @@ export class FullStoryShipper implements IShipper {
                 }
                 return acc;
               },
-              {} as Pick<FullStoryPageContext, "labels">,
+              {} as Pick<FullStoryPageContext, 'labels'>
             );
 
             return {
@@ -177,26 +149,23 @@ export class FullStoryShipper implements IShipper {
           // Wait for anything to actually change.
           distinct((pageVars) => {
             const sortedKeys = Object.keys(pageVars).sort();
-            return sortedKeys.map((key) => pageVars[key]).join("-");
+            return sortedKeys.map((key) => pageVars[key]).join('-');
           }),
           // We need some debounce time to ensure everything is updated before calling FS because some properties cannot be changed twice for the same URL.
-          debounceTime(pageVarsDebounceTimeMs),
+          debounceTime(pageVarsDebounceTimeMs)
         )
         .subscribe((pageVars) => {
-          this.initContext.logger.debug(
-            () =>
-              `Calling FS.setProperties/page with context ${JSON.stringify(pageVars)}`,
-          );
+          this.initContext.logger.debug(() => `Calling FS.setProperties/page with context ${JSON.stringify(pageVars)}`);
           const { properties, schema } = getPropertiesAndSchema({
             ...pageVars,
             ...(pageVars.version ? getParsedVersion(pageVars.version) : {}),
           });
-          this.fullStoryApi("setProperties", {
-            type: "page",
+          this.fullStoryApi('setProperties', {
+            type: 'page',
             properties,
             schema,
           });
-        }),
+        })
     );
   }
 
@@ -205,9 +174,7 @@ export class FullStoryShipper implements IShipper {
    * @param newContext The full new context to set {@link EventContext}
    */
   public extendContext(newContext: EventContext): void {
-    this.initContext.logger.debug(
-      () => `Received context ${JSON.stringify(newContext)}`,
-    );
+    this.initContext.logger.debug(() => `Received context ${JSON.stringify(newContext)}`);
 
     // FullStory requires different APIs for different type of contexts:
     // User-level context.
@@ -226,12 +193,12 @@ export class FullStoryShipper implements IShipper {
     // - `consent` is needed to allow collecting information about the components
     //   declared as "Record with user consent" (https://help.fullstory.com/hc/en-us/articles/360020623574).
     //   We need to explicitly call `consent` if for the "Record with user content" feature to work.
-    this.fullStoryApi("setIdentity", { consent: isOptedIn });
+    this.fullStoryApi('setIdentity', { consent: isOptedIn });
     // - `restart` and `shutdown` fully start/stop the collection of data.
     if (isOptedIn) {
-      this.fullStoryApi("restart");
+      this.fullStoryApi('restart');
     } else {
-      this.fullStoryApi("shutdown");
+      this.fullStoryApi('shutdown');
     }
   }
 
@@ -243,13 +210,11 @@ export class FullStoryShipper implements IShipper {
   public reportEvents(events: Event[]): void {
     this.initContext.logger.debug(`Reporting ${events.length} events to FS`);
     events
-      .filter(
-        (event) => this.eventTypesAllowlist?.includes(event.event_type) ?? true,
-      )
+      .filter((event) => this.eventTypesAllowlist?.includes(event.event_type) ?? true)
       .forEach((event) => {
         // We only read event.properties and discard the rest because the context is already sent in the other APIs.
         const { properties, schema } = getPropertiesAndSchema(event.properties);
-        this.fullStoryApi("trackEvent", {
+        this.fullStoryApi('trackEvent', {
           name: event.event_type,
           properties,
           schema,
@@ -278,31 +243,23 @@ export class FullStoryShipper implements IShipper {
   }: FullStoryUserVars) {
     // Call it only when the userId changes
     if (userId && userId !== this.lastUserId) {
-      this.initContext.logger.debug(
-        `Calling FS.identify with userId ${userId}`,
-      );
+      this.initContext.logger.debug(`Calling FS.identify with userId ${userId}`);
       // We need to call the API for every new userId (restarting the session).
-      this.fullStoryApi("setIdentity", { uid: userId });
+      this.fullStoryApi('setIdentity', { uid: userId });
       this.lastUserId = userId;
     }
 
     // User-level context
-    if (
-      typeof isElasticCloudUser === "boolean" ||
-      typeof cloudIsElasticStaffOwned === "boolean" ||
-      cloudTrialEndDate
-    ) {
+    if (typeof isElasticCloudUser === 'boolean' || typeof cloudIsElasticStaffOwned === 'boolean' || cloudTrialEndDate) {
       const userVars = {
         isElasticCloudUser,
         cloudIsElasticStaffOwned,
         cloudTrialEndDate,
       };
-      this.initContext.logger.debug(
-        () => `Calling FS.setProperties/user with ${JSON.stringify(userVars)}`,
-      );
+      this.initContext.logger.debug(() => `Calling FS.setProperties/user with ${JSON.stringify(userVars)}`);
       const { properties, schema } = getPropertiesAndSchema(userVars);
-      this.fullStoryApi("setProperties", {
-        type: "user",
+      this.fullStoryApi('setProperties', {
+        type: 'user',
         properties,
         schema,
       });

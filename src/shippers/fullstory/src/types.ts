@@ -6,7 +6,7 @@
  * Side Public License, v 1.
  */
 
-import type {FSApi as FullStoryApiV2} from '@fullstory/snippet'
+import type { FSApi as FullStoryApiV2 } from '@fullstory/snippet';
 
 /**
  * Definition of the FullStory API.

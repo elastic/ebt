@@ -15,24 +15,16 @@ import { either } from 'fp-ts/lib/Either';
  * @param validator The io-ts validator for the event.
  * @param payload The payload to validate.
  */
-export function validateSchema<Payload>(
-  sourceName: string,
-  validator: Type<Payload>,
-  payload: Payload
-): void {
+export function validateSchema<Payload>(sourceName: string, validator: Type<Payload>, payload: Payload): void {
   // Run io-ts validation to the event
   const result = validator.decode(payload);
 
   either.mapLeft(result, (validationErrors) => {
     const humanFriendlyErrors = validationErrors
-      .map(
-        (err) => `[${getFullPathKey(err.context)}]: ${err.message ?? readableContext(err.context)}`
-      )
+      .map((err) => `[${getFullPathKey(err.context)}]: ${err.message ?? readableContext(err.context)}`)
       .filter((errMsg, idx, listOfErrMsgs) => listOfErrMsgs.indexOf(errMsg, idx + 1) === -1);
     throw new Error(
-      `Failed to validate payload coming from "${sourceName}":\n\t- ${humanFriendlyErrors.join(
-        '\n\t- '
-      )}`
+      `Failed to validate payload coming from "${sourceName}":\n\t- ${humanFriendlyErrors.join('\n\t- ')}`
     );
   });
 }
@@ -61,12 +53,7 @@ function getFullPathKey(context: Context): string {
   return (
     context
       // Remove the context provided by InterfaceType and PartialType because their keys are simply numeric indices
-      .filter(
-        (ctx) =>
-          !['InterfaceType', 'PartialType'].includes(
-            (ctx.type as Type<unknown> & { _tag: string })._tag
-          )
-      )
+      .filter((ctx) => !['InterfaceType', 'PartialType'].includes((ctx.type as Type<unknown> & { _tag: string })._tag))
       .map(({ key }) => key)
       .filter(Boolean)
       .join('.')

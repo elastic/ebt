@@ -32,13 +32,7 @@ import {
   eventsToNDJSON,
   ErrorWithCode,
 } from '../../common';
-import type {
-  AnalyticsClientInitContext,
-  Event,
-  EventContext,
-  IShipper,
-  TelemetryCounter,
-} from '../../../../client';
+import type { AnalyticsClientInitContext, Event, EventContext, IShipper, TelemetryCounter } from '../../../../client';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -140,10 +134,7 @@ export class ElasticV3ServerShipper implements IShipper {
    */
   public reportEvents(events: Event[]) {
     // If opted out OR offline for longer than 24 hours, skip processing any events.
-    if (
-      this.isOptedIn$.value === false ||
-      (this.firstTimeOffline && Date.now() - this.firstTimeOffline > 24 * HOUR)
-    ) {
+    if (this.isOptedIn$.value === false || (this.firstTimeOffline && Date.now() - this.firstTimeOffline > 24 * HOUR)) {
       return;
     }
 
@@ -266,9 +257,7 @@ export class ElasticV3ServerShipper implements IShipper {
         // Only move ahead if it's opted-in and online, and there are some events in the queue
         filter(() => {
           const shouldSendAnything =
-            this.isOptedIn$.value === true &&
-            this.firstTimeOffline === null &&
-            this.internalQueue.length > 0;
+            this.isOptedIn$.value === true && this.firstTimeOffline === null && this.internalQueue.length > 0;
 
           // If it should not send anything, re-emit the inflight request observable just in case it's already 0
           if (!shouldSendAnything) {
@@ -365,10 +354,7 @@ export class ElasticV3ServerShipper implements IShipper {
     }
 
     if (!response.ok) {
-      throw new ErrorWithCode(
-        `${response.status} - ${await response.text()}`,
-        `${response.status}`
-      );
+      throw new ErrorWithCode(`${response.status} - ${await response.text()}`, `${response.status}`);
     }
 
     return `${response.status}`;

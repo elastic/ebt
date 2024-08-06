@@ -12,7 +12,7 @@ export function getParsedVersion(version: string): {
   version_minor: number;
   version_patch: number;
 } {
-  const [major, minor, patch] = version.split(".");
+  const [major, minor, patch] = version.split('.');
   return {
     version,
     version_major: parseInt(major, 10),

@@ -8,8 +8,9 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean && rimraf client shippers",
+    "lint": "prettier **.{js,ts}",
     "test:unit": "jest",
-    "prepare": "yarn clean && yarn test:unit && yarn build",
+    "prepare": "yarn clean && yarn lint -c && yarn test:unit && yarn build",
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
