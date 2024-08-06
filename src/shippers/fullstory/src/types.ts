@@ -6,13 +6,13 @@
  * Side Public License, v 1.
  */
 
-import type { FSApi as FullStoryApiV2 } from '@fullstory/snippet';
+import type { FSApi } from '@fullstory/snippet';
 
 /**
  * Definition of the FullStory API.
  * Docs are available at https://developer.fullstory.com/.
  */
-export type FullStoryApi = FullStoryApiV2;
+export type FullStoryApi = FSApi;
 
 declare global {
   interface Window {
