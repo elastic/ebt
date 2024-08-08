@@ -61,18 +61,18 @@ describe('AnalyticsClient', () => {
       });
 
       expect(() =>
-analyticsClient.registerEventType({
-  eventType: 'testEvent',
-  schema: {
-    b_field: {
-      type: 'date',
-      _meta: {
-        description: 'description of a_field'
-      }
-    }
-  }
-})
-).toThrowErrorMatchingInlineSnapshot(`"Event Type "testEvent" is already registered."`);
+        analyticsClient.registerEventType({
+          eventType: 'testEvent',
+          schema: {
+            b_field: {
+              type: 'date',
+              _meta: {
+                description: 'description of a_field',
+              },
+            },
+          },
+        })
+      ).toThrowErrorMatchingInlineSnapshot(`"Event Type "testEvent" is already registered."`);
     });
 
     test('it can be used after deconstruction of the client', () => {
@@ -93,9 +93,9 @@ analyticsClient.registerEventType({
 
   describe('reportEvent', () => {
     test('fails to report an event type because it is not registered yet', () => {
-      expect(() =>
-analyticsClient.reportEvent('testEvent', { a_field: 'a' })
-).toThrowErrorMatchingInlineSnapshot(`"Attempted to report event type "testEvent", before registering it. Use the "registerEventType" API to register it."`);
+      expect(() => analyticsClient.reportEvent('testEvent', { a_field: 'a' })).toThrowErrorMatchingInlineSnapshot(
+        `"Attempted to report event type "testEvent", before registering it. Use the "registerEventType" API to register it."`
+      );
     });
 
     test('fails to validate the event and throws', () => {
@@ -113,8 +113,8 @@ analyticsClient.reportEvent('testEvent', { a_field: 'a' })
       analyticsClient.optIn({ global: { enabled: true } });
 
       expect(
-  () => analyticsClient.reportEvent('testEvent', { a_field: 100 }) // a_field is expected to be a string
-).toThrowErrorMatchingInlineSnapshot(`
+        () => analyticsClient.reportEvent('testEvent', { a_field: 100 }) // a_field is expected to be a string
+      ).toThrowErrorMatchingInlineSnapshot(`
 "Failed to validate payload coming from "Event Type 'testEvent'":
 	- [a_field]: {"expected":"string","actual":"number","value":100}"
 `);
@@ -138,9 +138,7 @@ analyticsClient.reportEvent('testEvent', { a_field: 'a' })
         analyticsClient['internalEventQueue$'].pipe(take(3), toArray())
       );
 
-      const telemetryCounterPromise = lastValueFrom(
-        analyticsClient.telemetryCounter$.pipe(take(3), toArray())
-      );
+      const telemetryCounterPromise = lastValueFrom(analyticsClient.telemetryCounter$.pipe(take(3), toArray()));
 
       analyticsClient.reportEvent('testEvent', { a_field: 'a' });
       analyticsClient.reportEvent('testEvent', { a_field: 'b' });
@@ -243,17 +241,13 @@ analyticsClient.reportEvent('testEvent', { a_field: 'a' })
 
     test('Fails to register the same global shipper twice', () => {
       analyticsClient.registerShipper(shippersMock.MockedShipper, {});
-      expect(() =>
-analyticsClient.registerShipper(shippersMock.MockedShipper, {})
-).toThrowErrorMatchingInlineSnapshot(`"Shipper "mocked-shipper" is already registered"`);
+      expect(() => analyticsClient.registerShipper(shippersMock.MockedShipper, {})).toThrowErrorMatchingInlineSnapshot(
+        `"Shipper "mocked-shipper" is already registered"`
+      );
     });
 
     test('Registers an event exclusive shipper', () => {
-      analyticsClient.registerShipper(
-        shippersMock.MockedShipper,
-        {},
-        { exclusiveEventTypes: ['eventA', 'eventB'] }
-      );
+      analyticsClient.registerShipper(shippersMock.MockedShipper, {}, { exclusiveEventTypes: ['eventA', 'eventB'] });
 
       // eslint-disable-next-line dot-notation
       expect(analyticsClient['shippersRegistry'].allShippers.size).toBe(1);
@@ -577,9 +571,7 @@ analyticsClient.registerShipper(shippersMock.MockedShipper, {})
 
       const internalQueuePromise = lastValueFrom(internalEventQueue$.pipe(take(2), toArray()));
 
-      const telemetryCounterPromise = lastValueFrom(
-        analyticsClient.telemetryCounter$.pipe(take(2), toArray())
-      );
+      const telemetryCounterPromise = lastValueFrom(analyticsClient.telemetryCounter$.pipe(take(2), toArray()));
 
       analyticsClient.reportEvent('event-type-a', { a_field: 'a' });
       analyticsClient.reportEvent('event-type-b', { b_field: 100 });

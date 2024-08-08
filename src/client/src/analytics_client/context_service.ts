@@ -27,11 +27,7 @@ export class ContextService {
    * Registers a context provider, and subscribes to any updates from it.
    * @param contextProviderOpts The options to register the context provider {@link ContextProviderOpts}
    */
-  public registerContextProvider<Context>({
-    name,
-    context$,
-    schema,
-  }: ContextProviderOpts<Context>) {
+  public registerContextProvider<Context>({ name, context$, schema }: ContextProviderOpts<Context>) {
     if (this.contextProvidersSubscriptions.has(name)) {
       throw new Error(`Context provider with name '${name}' already registered`);
     }
@@ -44,11 +40,7 @@ export class ContextService {
         filter((context) => {
           if (validator) {
             try {
-              validateSchema(
-                `Context Provider '${name}'`,
-                validator,
-                context as Record<string, unknown>
-              );
+              validateSchema(`Context Provider '${name}'`, validator, context as Record<string, unknown>);
             } catch (validationError) {
               this.logger.error(validationError);
               return false;

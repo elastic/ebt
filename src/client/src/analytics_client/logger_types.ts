@@ -53,10 +53,7 @@ export interface Logger {
    * @param meta - The ECS meta to attach to the log entry
    *
    */
-  error(
-    errorOrMessage: LogMessageSource | Error,
-    meta?: Record<EventType, unknown>
-  ): void;
+  error(errorOrMessage: LogMessageSource | Error, meta?: Record<EventType, unknown>): void;
 
   /**
    * Returns a new {@link Logger} instance extending the current logger context.

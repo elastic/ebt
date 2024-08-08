@@ -43,8 +43,7 @@ import { schemaToIoTs, validateSchema } from '../schema/validation';
 
 export class AnalyticsClient implements IAnalyticsClient {
   private readonly internalTelemetryCounter$ = new Subject<TelemetryCounter>();
-  public readonly telemetryCounter$: Observable<TelemetryCounter> =
-    this.internalTelemetryCounter$.pipe(share()); // Using `share` so we can have multiple subscribers
+  public readonly telemetryCounter$: Observable<TelemetryCounter> = this.internalTelemetryCounter$.pipe(share()); // Using `share` so we can have multiple subscribers
   /**
    * This queue holds all the events until both conditions occur:
    * 1. We know the user's optIn decision.
@@ -58,10 +57,7 @@ export class AnalyticsClient implements IAnalyticsClient {
    * @private
    */
   private readonly shipperRegistered$ = new Subject<void>();
-  private readonly eventTypeRegistry = new Map<
-    EventType,
-    EventTypeOpts<unknown> & { validator?: Mixed }
-  >();
+  private readonly eventTypeRegistry = new Map<EventType, EventTypeOpts<unknown> & { validator?: Mixed }>();
   private readonly contextService: ContextService;
   private readonly context$ = new BehaviorSubject<Partial<EventContext>>({});
   private readonly optInConfig$ = new BehaviorSubject<OptInConfigService | undefined>(undefined);
@@ -83,10 +79,7 @@ export class AnalyticsClient implements IAnalyticsClient {
     this.reportEnqueuedEventsWhenClientIsReady();
   }
 
-  public reportEvent = <EventTypeData extends object>(
-    eventType: EventType,
-    eventData: EventTypeData
-  ) => {
+  public reportEvent = <EventTypeData extends object>(eventType: EventType, eventData: EventTypeData) => {
     // Fetch the timestamp as soon as we receive the event.
     const timestamp = new Date().toISOString();
 
@@ -114,11 +107,7 @@ export class AnalyticsClient implements IAnalyticsClient {
 
     // If the validator is registered (dev-mode only), perform the validation.
     if (eventTypeOpts.validator) {
-      validateSchema<EventTypeData>(
-        `Event Type '${eventType}'`,
-        eventTypeOpts.validator,
-        eventData
-      );
+      validateSchema<EventTypeData>(`Event Type '${eventType}'`, eventTypeOpts.validator, eventData);
     }
 
     const event: Event = {
@@ -205,10 +194,7 @@ export class AnalyticsClient implements IAnalyticsClient {
       try {
         shipper.optIn(isOptedIn);
       } catch (err) {
-        this.initContext.logger.warn(
-          `Failed to set isOptedIn:${isOptedIn} in shipper ${shipperName}`,
-          err
-        );
+        this.initContext.logger.warn(`Failed to set isOptedIn:${isOptedIn} in shipper ${shipperName}`, err);
       }
     });
 
@@ -218,10 +204,7 @@ export class AnalyticsClient implements IAnalyticsClient {
         try {
           shipper.extendContext!(context);
         } catch (err) {
-          this.initContext.logger.warn(
-            `Shipper "${shipperName}" failed to extend the context`,
-            err
-          );
+          this.initContext.logger.warn(`Shipper "${shipperName}" failed to extend the context`, err);
         }
       });
     }
@@ -275,10 +258,7 @@ export class AnalyticsClient implements IAnalyticsClient {
         try {
           shipper.reportEvents(events);
         } catch (err) {
-          this.initContext.logger.warn(
-            `Failed to report event "${eventType}" via shipper "${shipperName}"`,
-            err
-          );
+          this.initContext.logger.warn(`Failed to report event "${eventType}" via shipper "${shipperName}"`, err);
         }
       }
     });

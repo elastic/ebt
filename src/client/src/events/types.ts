@@ -72,12 +72,7 @@ export type EventType = string;
  * - failed: There was an error when processing/shipping the event. Refer to the Telemetry Counter's code for the reason.
  * - dropped: The event was dropped from the queue. Refer to the Telemetry Counter's code for the reason.
  */
-export type TelemetryCounterType =
-  | 'enqueued'
-  | 'sent_to_shipper'
-  | 'succeeded'
-  | 'failed'
-  | 'dropped';
+export type TelemetryCounterType = 'enqueued' | 'sent_to_shipper' | 'succeeded' | 'failed' | 'dropped';
 
 /**
  * Shape of the events emitted by the telemetryCounter$ observable

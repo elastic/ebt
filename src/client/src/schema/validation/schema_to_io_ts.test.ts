@@ -105,29 +105,21 @@ describe(`convertSchemaToIoTs`, () => {
     });
     expect(validator.is({ an_array: [{ docs: { field: 'abc' } }] })).toBe(false);
   });
-  test.each([
-    'boolean',
-    'byte',
-    'double',
-    'float',
-    'integer',
-    'long',
-    'short',
-  ] as AllowedSchemaTypes[])('Expected type %s, but got string', (type) => {
-    const validator = schemaToIoTs({
-      a_field: { type, _meta: { description: 'Test description' } },
-    });
-    expect(validator.is({ a_field: 'abc' })).toBe(false);
-  });
-  test.each(['keyword', 'text', 'date'] as AllowedSchemaTypes[])(
-    'Expected type %s, but got number',
+  test.each(['boolean', 'byte', 'double', 'float', 'integer', 'long', 'short'] as AllowedSchemaTypes[])(
+    'Expected type %s, but got string',
     (type) => {
       const validator = schemaToIoTs({
         a_field: { type, _meta: { description: 'Test description' } },
       });
-      expect(validator.is({ a_field: 1234 })).toBe(false);
+      expect(validator.is({ a_field: 'abc' })).toBe(false);
     }
   );
+  test.each(['keyword', 'text', 'date'] as AllowedSchemaTypes[])('Expected type %s, but got number', (type) => {
+    const validator = schemaToIoTs({
+      a_field: { type, _meta: { description: 'Test description' } },
+    });
+    expect(validator.is({ a_field: 1234 })).toBe(false);
+  });
   test('Support DYNAMIC_KEY', () => {
     const validator = schemaToIoTs({
       a_field: {

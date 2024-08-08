@@ -82,10 +82,7 @@ const stripKeys = <T>(o: T, props: t.Props): Either<string[], T> => {
  * @param codec The io-ts schema to wrap with this validation
  * @param name (optional) Replace the custom logic to name the validation error by providing a static name.
  */
-export const excess = <C extends t.HasProps>(
-  codec: C,
-  name: string = getExcessTypeName(codec)
-): ExcessType<C> => {
+export const excess = <C extends t.HasProps>(codec: C, name: string = getExcessTypeName(codec)): ExcessType<C> => {
   const props: t.Props = getProps(codec);
   return new ExcessType<C>(
     name,

@@ -9,15 +9,15 @@
 import * as RxJS from 'rxjs';
 import type { FullStoryApi } from './types';
 
-export const fullStoryApiMock: jest.Mocked<FullStoryApi> = {
-  identify: jest.fn(),
-  setUserVars: jest.fn(),
-  setVars: jest.fn(),
-  consent: jest.fn(),
-  restart: jest.fn(),
-  shutdown: jest.fn(),
-  event: jest.fn(),
-};
+export const fullStoryApiMock: jest.Mocked<FullStoryApi> = jest.fn() as unknown as jest.Mocked<FullStoryApi>;
+fullStoryApiMock.identify = jest.fn();
+fullStoryApiMock.setUserVars = jest.fn();
+fullStoryApiMock.setVars = jest.fn();
+fullStoryApiMock.consent = jest.fn();
+fullStoryApiMock.restart = jest.fn();
+fullStoryApiMock.shutdown = jest.fn();
+fullStoryApiMock.event = jest.fn();
+
 jest.doMock('./load_snippet', () => {
   return {
     loadSnippet: () => fullStoryApiMock,

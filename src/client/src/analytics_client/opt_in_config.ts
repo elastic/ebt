@@ -57,8 +57,7 @@ export class OptInConfigService {
         return false;
       }
 
-      const eventTypeOptInConfig =
-        this.optInConfig.event_types && this.optInConfig.event_types[eventType];
+      const eventTypeOptInConfig = this.optInConfig.event_types && this.optInConfig.event_types[eventType];
       // In case of not provided a specific eventType-level shipper consent, we assume opted-in
       const isEventTypeShipperOptedIn: boolean =
         (eventTypeOptInConfig?.shippers && eventTypeOptInConfig.shippers[shipperName]) ?? true;

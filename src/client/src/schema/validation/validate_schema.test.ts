@@ -28,16 +28,16 @@ describe('validateSchema', () => {
   describe('failed', () => {
     test('object is valid but it has some extra fields not declared in the schema', () => {
       expect(() =>
-validateSchema(
-  'test source',
-  schemaToIoTs({
-    an_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } }
-    }
-  }),
-  { an_object: { a_field: 'test' }, another_object: { a_field: 'test' } }
-)
-).toThrowErrorMatchingInlineSnapshot(`
+        validateSchema(
+          'test source',
+          schemaToIoTs({
+            an_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+            },
+          }),
+          { an_object: { a_field: 'test' }, another_object: { a_field: 'test' } }
+        )
+      ).toThrowErrorMatchingInlineSnapshot(`
 "Failed to validate payload coming from "test source":
 	- []: excess key 'another_object' found"
 `);
@@ -45,16 +45,16 @@ validateSchema(
 
     test('object is valid but it has some extra nested fields not declared in the schema', () => {
       expect(() =>
-validateSchema(
-  'test source',
-  schemaToIoTs({
-    an_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } }
-    }
-  }),
-  { an_object: { a_field: 'test', an_extra_field: 'test' } }
-)
-).toThrowErrorMatchingInlineSnapshot(`
+        validateSchema(
+          'test source',
+          schemaToIoTs({
+            an_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+            },
+          }),
+          { an_object: { a_field: 'test', an_extra_field: 'test' } }
+        )
+      ).toThrowErrorMatchingInlineSnapshot(`
 "Failed to validate payload coming from "test source":
 	- [an_object]: excess key 'an_extra_field' found"
 `);
@@ -62,20 +62,20 @@ validateSchema(
 
     test('the object is not valid because it is missing a key', () => {
       expect(() =>
-validateSchema(
-  'test source',
-  schemaToIoTs<unknown>({
-    an_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } }
-    },
-    an_optional_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
-      _meta: { optional: true }
-    }
-  }),
-  { another_object: { a_field: 'test' } }
-)
-).toThrowErrorMatchingInlineSnapshot(`
+        validateSchema(
+          'test source',
+          schemaToIoTs<unknown>({
+            an_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+            },
+            an_optional_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+              _meta: { optional: true },
+            },
+          }),
+          { another_object: { a_field: 'test' } }
+        )
+      ).toThrowErrorMatchingInlineSnapshot(`
 "Failed to validate payload coming from "test source":
 	- [an_object]: {"expected":"{ a_field: string }","actual":"undefined","value":"undefined"}"
 `);
@@ -83,24 +83,24 @@ validateSchema(
 
     test('lists multiple errors', () => {
       expect(() =>
-validateSchema(
-  'test source',
-  schemaToIoTs<unknown>({
-    an_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } }
-    },
-    an_optional_object: {
-      properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
-      _meta: { optional: true }
-    }
-  }),
-  {
-    an_object: { a_field: 'test', an_extra_field: 'test' },
-    an_optional_object: {},
-    another_object: { a_field: 'test' }
-  }
-)
-).toThrowErrorMatchingInlineSnapshot(`
+        validateSchema(
+          'test source',
+          schemaToIoTs<unknown>({
+            an_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+            },
+            an_optional_object: {
+              properties: { a_field: { type: 'keyword', _meta: { description: 'A test field' } } },
+              _meta: { optional: true },
+            },
+          }),
+          {
+            an_object: { a_field: 'test', an_extra_field: 'test' },
+            an_optional_object: {},
+            another_object: { a_field: 'test' },
+          }
+        )
+      ).toThrowErrorMatchingInlineSnapshot(`
 "Failed to validate payload coming from "test source":
 	- [an_object]: excess key 'an_extra_field' found
 	- [an_optional_object.a_field]: {"expected":"string","actual":"undefined","value":"undefined"}"

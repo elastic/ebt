@@ -19,31 +19,59 @@ const FULLSTORY_RESERVED_PROPERTIES = [
   'pageName',
 ];
 
-export function formatPayload(context: object): Record<string, unknown> {
-  // format context keys as required for env vars, see docs: https://help.fullstory.com/hc/en-us/articles/360020623234
+export type FSProperties = Record<string, unknown>;
+export type FSSchema = { [p: string]: string | FSSchema };
+
+export function getPropertiesAndSchema(context: object): {
+  properties: FSProperties;
+  schema: { properties: FSSchema };
+} {
+  // Clean the properties by removing undefined at all levels
+  const properties = removeUndefined(context);
+  const schema = buildSchema(properties);
+  return { properties, schema: { properties: schema } };
+}
+
+function removeUndefined(context: object): FSProperties {
   return Object.fromEntries(
     Object.entries(context)
       // Discard any undefined values
       .map<[string, unknown]>(([key, value]) => {
-        return Array.isArray(value)
-          ? [key, value.filter((v) => typeof v !== 'undefined')]
-          : [key, value];
+        return Array.isArray(value) ? [key, value.filter((v) => typeof v !== 'undefined')] : [key, value];
       })
-      .filter(
-        ([, value]) => typeof value !== 'undefined' && (!Array.isArray(value) || value.length > 0)
-      )
-      // Transform key names according to the FullStory needs
+      .filter(([, value]) => typeof value !== 'undefined' && (!Array.isArray(value) || value.length > 0))
       .map(([key, value]) => {
-        if (FULLSTORY_RESERVED_PROPERTIES.includes(key)) {
-          return [key, value];
-        }
         if (isRecord(value)) {
-          return [key, formatPayload(value)];
+          return [key, removeUndefined(value)];
+        }
+        return [key, value];
+      })
+  );
+}
+
+/**
+ * Build the schema as per FullStory requirements https://developer.fullstory.com/browser/custom-properties/
+ * @param context
+ */
+export function buildSchema(context: object): FSSchema {
+  return Object.fromEntries(
+    Object.entries(context)
+      // Discard any undefined values
+      .map<[string, unknown]>(([key, value]) => {
+        return Array.isArray(value) ? [key, value.filter((v) => typeof v !== 'undefined')] : [key, value];
+      })
+      // Discard reserved properties (no need to define them in the schema)
+      .filter(([key]) => !FULLSTORY_RESERVED_PROPERTIES.includes(key))
+      .filter(([, value]) => typeof value !== 'undefined' && (!Array.isArray(value) || value.length > 0))
+      // Infer the type according to the FullStory specs
+      .map(([key, value]) => {
+        if (isRecord(value)) {
+          return [key, buildSchema(value)];
         }
         const valueType = getFullStoryType(value);
-        const formattedKey = valueType ? `${key}_${valueType}` : key;
-        return [formattedKey, value];
+        return [key, valueType];
       })
+      .filter(([, value]) => typeof value !== 'undefined')
   );
 }
 

@@ -12,7 +12,7 @@ import has from 'lodash.has';
 import type { AnalyticsClientInitContext, EventContext, Event, IShipper } from '../../../client';
 import type { FullStoryApi } from './types';
 import type { FullStorySnippetConfig } from './load_snippet';
-import { formatPayload } from './format_payload';
+import { getPropertiesAndSchema } from './get_properties_and_schema';
 import { loadSnippet } from './load_snippet';
 import { getParsedVersion } from './get_parsed_version';
 
@@ -42,9 +42,7 @@ const PAGE_VARS_KEYS = [
 ] as const;
 
 // `labels` object keys from page vars.
-const PAGE_VARS_LABELS_KEYS = [
-  'serverless'
-] as const;
+const PAGE_VARS_LABELS_KEYS = ['serverless'] as const;
 
 /**
  * FullStory shipper configuration.
@@ -120,21 +118,27 @@ export class FullStoryShipper implements IShipper {
             // > Note: You can capture up to 20 unique page properties (exclusive of pageName) for any given page
             // > and up to 500 unique page properties across all pages.
             // https://help.fullstory.com/hc/en-us/articles/1500004101581-FS-setVars-API-Sending-custom-page-data-to-FullStory
-            const pageVars = PAGE_VARS_KEYS.reduce((acc, key) => {
-              if (has(newContext, key)) {
-                acc[key] = get(newContext, key) as any;
-              }
-              return acc;
-            }, {} as Record<string, unknown>);
+            const pageVars = PAGE_VARS_KEYS.reduce(
+              (acc, key) => {
+                if (has(newContext, key)) {
+                  acc[key] = get(newContext, key) as any;
+                }
+                return acc;
+              },
+              {} as Record<string, unknown>
+            );
 
-            const pageLabelsVars = PAGE_VARS_LABELS_KEYS.reduce((acc, key) => {
-              const labelKey = `labels.${key}`;
-              if (has(newContext, labelKey)) {
-                acc.labels = acc.labels || {};
-                acc.labels[key] = get(newContext, labelKey);
-              }
-              return acc;
-            }, {} as Pick<FullStoryPageContext, 'labels'>);
+            const pageLabelsVars = PAGE_VARS_LABELS_KEYS.reduce(
+              (acc, key) => {
+                const labelKey = `labels.${key}`;
+                if (has(newContext, labelKey)) {
+                  acc.labels = acc.labels || {};
+                  acc.labels[key] = get(newContext, labelKey);
+                }
+                return acc;
+              },
+              {} as Pick<FullStoryPageContext, 'labels'>
+            );
 
             return {
               ...pageVars,
@@ -151,12 +155,15 @@ export class FullStoryShipper implements IShipper {
           debounceTime(pageVarsDebounceTimeMs)
         )
         .subscribe((pageVars) => {
-          this.initContext.logger.debug(
-            () => `Calling FS.setVars with context ${JSON.stringify(pageVars)}`
-          );
-          this.fullStoryApi.setVars('page', {
-            ...formatPayload(pageVars),
+          this.initContext.logger.debug(() => `Calling FS.setProperties/page with context ${JSON.stringify(pageVars)}`);
+          const { properties, schema } = getPropertiesAndSchema({
+            ...pageVars,
             ...(pageVars.version ? getParsedVersion(pageVars.version) : {}),
+          });
+          this.fullStoryApi('setProperties', {
+            type: 'page',
+            properties,
+            schema,
           });
         })
     );
@@ -186,12 +193,12 @@ export class FullStoryShipper implements IShipper {
     // - `consent` is needed to allow collecting information about the components
     //   declared as "Record with user consent" (https://help.fullstory.com/hc/en-us/articles/360020623574).
     //   We need to explicitly call `consent` if for the "Record with user content" feature to work.
-    this.fullStoryApi.consent(isOptedIn);
+    this.fullStoryApi('setIdentity', { consent: isOptedIn });
     // - `restart` and `shutdown` fully start/stop the collection of data.
     if (isOptedIn) {
-      this.fullStoryApi.restart();
+      this.fullStoryApi('restart');
     } else {
-      this.fullStoryApi.shutdown();
+      this.fullStoryApi('shutdown');
     }
   }
 
@@ -206,7 +213,12 @@ export class FullStoryShipper implements IShipper {
       .filter((event) => this.eventTypesAllowlist?.includes(event.event_type) ?? true)
       .forEach((event) => {
         // We only read event.properties and discard the rest because the context is already sent in the other APIs.
-        this.fullStoryApi.event(event.event_type, formatPayload(event.properties));
+        const { properties, schema } = getPropertiesAndSchema(event.properties);
+        this.fullStoryApi('trackEvent', {
+          name: event.event_type,
+          properties,
+          schema,
+        });
       });
   }
 
@@ -233,25 +245,24 @@ export class FullStoryShipper implements IShipper {
     if (userId && userId !== this.lastUserId) {
       this.initContext.logger.debug(`Calling FS.identify with userId ${userId}`);
       // We need to call the API for every new userId (restarting the session).
-      this.fullStoryApi.identify(userId);
+      this.fullStoryApi('setIdentity', { uid: userId });
       this.lastUserId = userId;
     }
 
     // User-level context
-    if (
-      typeof isElasticCloudUser === 'boolean' ||
-      typeof cloudIsElasticStaffOwned === 'boolean' ||
-      cloudTrialEndDate
-    ) {
+    if (typeof isElasticCloudUser === 'boolean' || typeof cloudIsElasticStaffOwned === 'boolean' || cloudTrialEndDate) {
       const userVars = {
         isElasticCloudUser,
         cloudIsElasticStaffOwned,
         cloudTrialEndDate,
       };
-      this.initContext.logger.debug(
-        () => `Calling FS.setUserVars with ${JSON.stringify(userVars)}`
-      );
-      this.fullStoryApi.setUserVars(formatPayload(userVars));
+      this.initContext.logger.debug(() => `Calling FS.setProperties/user with ${JSON.stringify(userVars)}`);
+      const { properties, schema } = getPropertiesAndSchema(userVars);
+      this.fullStoryApi('setProperties', {
+        type: 'user',
+        properties,
+        schema,
+      });
     }
   }
 }
