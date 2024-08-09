@@ -21,7 +21,7 @@
     "lodash.has": "^4.5.2",
     "moment": "^2.30.1",
     "node-fetch": "^2.6.7",
-    "rxjs": "^7.5.5",
+    "rxjs": "^7.8.1",
     "typescript": "^5.5.4"
   },
   "devDependencies": {
