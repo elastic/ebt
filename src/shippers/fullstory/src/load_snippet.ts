@@ -33,6 +33,11 @@ export interface FullStorySnippetConfig {
    * The name of the variable where the API is stored: `window[namespace]`. Defaults to `FS`.
    */
   namespace?: string;
+  /**
+   * Set to `false` to hold FS from capturing as soon as the snippet is loaded.
+   * https://developer.fullstory.com/browser/auto-capture/capture-data/#manually-delay-data-capture
+   */
+  captureOnStartup?: boolean;
 }
 
 export function loadSnippet({
@@ -41,6 +46,7 @@ export function loadSnippet({
   host = 'fullstory.com',
   namespace = 'FS',
   debug = false,
+  captureOnStartup,
 }: FullStorySnippetConfig): FullStoryApi {
   window._fs_debug = debug;
   window._fs_host = host;
@@ -48,39 +54,12 @@ export function loadSnippet({
   window._fs_org = fullStoryOrgId;
   window._fs_namespace = namespace;
 
-  /* prettier-ignore */
-  (function(m,n,e,t,l,o,g,y){
-    if (e in m) {if(m.console && m.console.log) { m.console.log('FullStory namespace conflict. Please set window["_fs_namespace"].');} return;}
-    // @ts-expect-error
-    g=m[e]=function(a,b,s){g.q?g.q.push([a,b,s]):g._api(a,b,s);};g.q=[];
-    // @ts-expect-error
-    o=n.createElement(t);o.async=1;o.crossOrigin='anonymous';o.src=_fs_script;
-    // @ts-expect-error
-    y=n.getElementsByTagName(t)[0];y.parentNode.insertBefore(o,y);
-    // @ts-expect-error
-    g.identify=function(i,v,s){g(l,{uid:i},s);if(v)g(l,v,s)};g.setUserVars=function(v,s){g(l,v,s)};g.event=function(i,v,s){g('event',{n:i,p:v},s)};
-    // @ts-expect-error
-    g.anonymize=function(){g.identify(!!0)};
-    // @ts-expect-error
-    g.shutdown=function(){g("rec",!1)};g.restart=function(){g("rec",!0)};
-    // @ts-expect-error
-    g.log = function(a,b){g("log",[a,b])};
-    // @ts-expect-error
-    g.consent=function(a){g("consent",!arguments.length||a)};
-    // @ts-expect-error
-    g.identifyAccount=function(i,v){o='account';v=v||{};v.acctId=i;g(o,v)};
-    // @ts-expect-error
-    g.clearUserCookie=function(){};
-    // @ts-expect-error
-    g.setVars=function(n, p){g('setVars',[n,p]);};
-    // @ts-expect-error
-    g._w={};y='XMLHttpRequest';g._w[y]=m[y];y='fetch';g._w[y]=m[y];
-    // @ts-expect-error
-    if(m[y])m[y]=function(){return g._w[y].apply(this,arguments)};
-    // @ts-expect-error
-    g._v="1.3.0";
+  // Only set it if the option is provided, since documentation doesn't show it as a "normal" thing to set up.
+  if (typeof captureOnStartup === 'boolean') {
+    window._fs_capture_on_startup = captureOnStartup;
+  }
 
-  })(window,document,window['_fs_namespace'],'script','user');
+  require('./raw_snippet'); // load and execute the snippet. Moved to a separate file so that we can disable type-checks.
 
   const fullStoryApi = window[namespace as 'FS'];
 

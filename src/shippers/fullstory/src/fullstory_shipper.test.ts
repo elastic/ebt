@@ -322,4 +322,92 @@ describe('FullStoryShipper', () => {
       });
     });
   });
+
+  describe('when delayedStartup is ON (captureOnStartup: false)', () => {
+    beforeEach(() => {
+      fullstoryShipper.shutdown(); // Stop the shipper created in the parent beforeEach
+      fullstoryShipper = new FullStoryShipper(
+        { debug: true, fullStoryOrgId: 'test-org-id', captureOnStartup: false },
+        { logger: loggerMock.create(), isDev: true }
+      );
+    });
+    describe('When the user is not set', () => {
+      test('optIn(true) should call consent true but hold from calling start/restart', () => {
+        fullstoryShipper.optIn(true);
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          consent: true,
+        });
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+      });
+
+      test('optIn(false) should call consent false and shutdown when isOptIn: false', () => {
+        fullstoryShipper.optIn(false);
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          consent: false,
+        });
+        expect(fullStoryApiMock).toHaveBeenCalledWith('shutdown');
+      });
+
+      test('identifying a user when previously opted in calls start', () => {
+        fullstoryShipper.optIn(true);
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+
+        fullstoryShipper.extendContext({ userId: 'test-user-id' });
+        expect(fullStoryApiMock).toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+      });
+
+      test('identifying a user when previously opted out does not call start', () => {
+        fullstoryShipper.optIn(false);
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+
+        fullstoryShipper.extendContext({ userId: 'test-user-id' });
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+      });
+    });
+
+    describe('When the user is set', () => {
+      beforeEach(() => {
+        fullstoryShipper.extendContext({ userId: 'test-user-id' });
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          uid: 'test-user-id',
+        });
+      });
+
+      test('start is not called until an opt-in status is resolved', () => {
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+      });
+
+      test('optIn(true) should call consent true and start when not previously shut down', () => {
+        fullstoryShipper.optIn(true);
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          consent: true,
+        });
+        expect(fullStoryApiMock).toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('restart');
+      });
+
+      test('optIn(false) should call consent false and shutdown when isOptIn: false', () => {
+        fullstoryShipper.optIn(false);
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          consent: false,
+        });
+        expect(fullStoryApiMock).toHaveBeenCalledWith('shutdown');
+      });
+
+      test('optIn(true) should call consent true and start when not previously shut down', () => {
+        fullstoryShipper.optIn(false); // shutdown first
+        fullstoryShipper.optIn(true);
+        expect(fullStoryApiMock).toHaveBeenCalledWith('setIdentity', {
+          consent: true,
+        });
+        expect(fullStoryApiMock).not.toHaveBeenCalledWith('start');
+        expect(fullStoryApiMock).toHaveBeenCalledWith('restart');
+      });
+    });
+  });
 });

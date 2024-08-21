@@ -54,7 +54,7 @@ export interface FullStoryShipperConfig extends FullStorySnippetConfig {
    */
   eventTypesAllowlist?: string[];
   /**
-   * FullStory only allows calling setVars('page') once per navigation.
+   * FullStory only allows calling `FS('setProperties', { type: 'page' })` once per navigation.
    * This setting defines how much time to hold from calling the API while additional lazy context is being resolved.
    */
   pageVarsDebounceTimeMs?: number;
@@ -82,10 +82,12 @@ export class FullStoryShipper implements IShipper {
 
   private readonly fullStoryApi: FullStoryApi;
   private lastUserId: string | undefined;
+  private optedIn: boolean | undefined;
   private readonly eventTypesAllowlist?: string[];
   private readonly pageContext$ = new Subject<EventContext>();
   private readonly userContext$ = new Subject<FullStoryUserVars>();
   private readonly subscriptions = new Subscription();
+  private readonly delayedStartup: boolean;
 
   /**
    * Creates a new instance of the FullStoryShipper.
@@ -99,6 +101,7 @@ export class FullStoryShipper implements IShipper {
     const { eventTypesAllowlist, pageVarsDebounceTimeMs = 500, ...snippetConfig } = config;
     this.fullStoryApi = loadSnippet(snippetConfig);
     this.eventTypesAllowlist = eventTypesAllowlist;
+    this.delayedStartup = snippetConfig.captureOnStartup === false;
 
     this.subscriptions.add(
       this.userContext$
@@ -196,10 +199,31 @@ export class FullStoryShipper implements IShipper {
     this.fullStoryApi('setIdentity', { consent: isOptedIn });
     // - `restart` and `shutdown` fully start/stop the collection of data.
     if (isOptedIn) {
-      this.fullStoryApi('restart');
+      // When using the delayed startup strategy...
+      if (this.delayedStartup) {
+        // ... it is recommended to identify the user before enabling capture to avoid duplicated sessions
+        // when navigating across multiple domains (Cloud UI <-> Deployment 1 <-> Deployment 2 <-> Project 1).
+
+        // If the user is already present, we can start/resume the capture straight away.
+        if (this.lastUserId) {
+          if (this.optedIn === false) {
+            // when previously shut down => restart
+            // https://developer.fullstory.com/browser/auto-capture/capture-data/#restart-data-capture
+            this.fullStoryApi('restart');
+          } else {
+            this.fullStoryApi('start');
+          }
+        }
+      } else {
+        this.fullStoryApi('restart');
+      }
     } else {
       this.fullStoryApi('shutdown');
     }
+
+    // Storing the state because it's necessary to find out whether to start/restart,
+    // and it's used to explicitly start after the user is identified in delayedStartup mode.
+    this.optedIn = isOptedIn;
   }
 
   /**
@@ -247,6 +271,11 @@ export class FullStoryShipper implements IShipper {
       // We need to call the API for every new userId (restarting the session).
       this.fullStoryApi('setIdentity', { uid: userId });
       this.lastUserId = userId;
+
+      // When delayed startup is enabled, we need to manually start capturing after identifying the user.
+      if (this.delayedStartup && this.optedIn) {
+        this.fullStoryApi('start');
+      }
     }
 
     // User-level context

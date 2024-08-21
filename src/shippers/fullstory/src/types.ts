@@ -16,6 +16,11 @@ export type FullStoryApi = FSApi;
 
 declare global {
   interface Window {
+    /**
+     * Set to `false` to hold FS from capturing as soon as the snippet is loaded.
+     * https://developer.fullstory.com/browser/auto-capture/capture-data/#manually-delay-data-capture
+     */
+    _fs_capture_on_startup: boolean;
     _fs_debug: boolean;
     _fs_host: string;
     _fs_org: string;
