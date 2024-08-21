@@ -252,9 +252,7 @@ describe('ContextService', () => {
         },
         context$: new Subject<{ a_field: boolean }>(),
       });
-    }).toThrowErrorMatchingInlineSnapshot(
-      `"Context provider with name 'contextProviderA' already registered"`
-    );
+    }).toThrowErrorMatchingInlineSnapshot(`"Context provider with name 'contextProviderA' already registered"`);
   });
 
   test('Does not remove the context provider after it completes', async () => {

@@ -14,10 +14,7 @@ import type { Event, TelemetryCounter, TelemetryCounterType } from '../../../../
  * @param telemetryCounter$ The observable that will be used to emit the telemetry counters
  * @param source The name of the shipper that is sending the events.
  */
-export function createTelemetryCounterHelper(
-  telemetryCounter$: Subject<TelemetryCounter>,
-  source: string
-) {
+export function createTelemetryCounterHelper(telemetryCounter$: Subject<TelemetryCounter>, source: string) {
   /**
    * Triggers a telemetry counter for each event type.
    * @param events The events to trigger the telemetry counter for.
@@ -51,12 +48,15 @@ export function createTelemetryCounterHelper(
 }
 
 function countEventTypes(events: Event[]) {
-  return events.reduce((acc, event) => {
-    if (acc[event.event_type]) {
-      acc[event.event_type] += 1;
-    } else {
-      acc[event.event_type] = 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  return events.reduce(
+    (acc, event) => {
+      if (acc[event.event_type]) {
+        acc[event.event_type] += 1;
+      } else {
+        acc[event.event_type] = 1;
+      }
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 }

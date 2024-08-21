@@ -37,9 +37,7 @@ describe('excess', () => {
     const result = validator.decode(invalidObj);
     expect(isLeft(result)).toBe(true);
     either.mapLeft(result, (validationErrors) =>
-      expect(validationErrors.map((err) => err.message)).toStrictEqual([
-        `excess key 'another_string' found`,
-      ])
+      expect(validationErrors.map((err) => err.message)).toStrictEqual([`excess key 'another_string' found`])
     );
   });
 });
