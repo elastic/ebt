@@ -13,16 +13,11 @@
 import { loadSnippet } from './load_snippet';
 
 describe('loadSnippet', () => {
-  beforeAll(() => {
-    // Define necessary window and document global variables for the tests
-    jest
-      .spyOn(global.document, 'getElementsByTagName')
-      .mockReturnValue([{ parentNode: { insertBefore: jest.fn() } }] as unknown as HTMLCollectionOf<Element>);
-  });
-
   it('should return the FullStory API', () => {
     const fullStoryApi = loadSnippet({ debug: true, fullStoryOrgId: 'foo' });
     expect(fullStoryApi).toBeDefined();
+    expect(typeof fullStoryApi).toBe('function'); // V2: the root API is already the method to call.
+    // V1 deprecated methods
     expect(fullStoryApi.event).toBeDefined();
     expect(fullStoryApi.consent).toBeDefined();
     expect(fullStoryApi.restart).toBeDefined();
@@ -31,4 +26,17 @@ describe('loadSnippet', () => {
     expect(fullStoryApi.setUserVars).toBeDefined();
     expect(fullStoryApi.setVars).toBeDefined();
   });
+
+  it('captureOnStartup: undefined should not add the window._fs_capture_on_startup', () => {
+    loadSnippet({ fullStoryOrgId: 'foo' });
+    expect(window._fs_capture_on_startup).toBeUndefined();
+  });
+
+  it.each([{ option: true }, { option: false }])(
+    'captureOnStartup: $option should set window._fs_capture_on_startup: $option',
+    ({ option }) => {
+      loadSnippet({ fullStoryOrgId: 'foo', captureOnStartup: option });
+      expect(window._fs_capture_on_startup).toBe(option);
+    }
+  );
 });
