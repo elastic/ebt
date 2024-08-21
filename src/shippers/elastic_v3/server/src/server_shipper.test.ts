@@ -116,19 +116,16 @@ describe('ElasticV3ServerShipper', () => {
     const counter = firstValueFrom(shipper.telemetryCounter$);
     setLastBatchSent(Date.now() - 10 * SECONDS);
     await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
         {
           "code": "200",
@@ -154,19 +151,16 @@ describe('ElasticV3ServerShipper', () => {
     const counter = firstValueFrom(shipper.telemetryCounter$);
     shipper.shutdown();
     jest.advanceTimersToNextTimer(); // We are handling the shutdown in a promise, so we need to wait for the next tick.
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
       {
         "code": "200",
@@ -189,18 +183,15 @@ describe('ElasticV3ServerShipper', () => {
     shipper.optIn(true);
     setLastBatchSent(Date.now() - 10 * SECONDS);
     await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        method: 'POST',
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      method: 'POST',
+    });
   });
 
   test('sends when the queue overflows the 10kB leaky bucket one batch every 10s', async () => {
@@ -214,24 +205,20 @@ describe('ElasticV3ServerShipper', () => {
       const counter = firstValueFrom(shipper.telemetryCounter$);
       setLastBatchSent(Date.now() - 10 * SECONDS);
       await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-      expect(fetchMock).toHaveBeenNthCalledWith(
-        i + 1,
-        'https://telemetry-staging.elastic.co/v3/send/test-channel',
-        {
-          body: new Array(103)
-            .fill(
-              '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n'
-            )
-            .join(''),
-          headers: {
-            'content-type': 'application/x-ndjson',
-            'x-elastic-cluster-id': 'UNKNOWN',
-            'x-elastic-stack-version': '1.2.3',
-          },
-          method: 'POST',
-          query: { debug: true },
-        }
-      );
+      expect(fetchMock).toHaveBeenNthCalledWith(i + 1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+        body: new Array(103)
+          .fill(
+            '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n'
+          )
+          .join(''),
+        headers: {
+          'content-type': 'application/x-ndjson',
+          'x-elastic-cluster-id': 'UNKNOWN',
+          'x-elastic-stack-version': '1.2.3',
+        },
+        method: 'POST',
+        query: { debug: true },
+      });
       await expect(counter).resolves.toMatchInlineSnapshot(`
           {
             "code": "200",
@@ -259,19 +246,16 @@ describe('ElasticV3ServerShipper', () => {
     const counter = firstValueFrom(shipper.telemetryCounter$);
     setLastBatchSent(Date.now() - 10 * SECONDS);
     await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
         {
           "code": "Failed to fetch",
@@ -294,19 +278,16 @@ describe('ElasticV3ServerShipper', () => {
     const counter = firstValueFrom(shipper.telemetryCounter$);
     setLastBatchSent(Date.now() - 10 * SECONDS);
     await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
         {
           "code": "400",
@@ -326,18 +307,16 @@ describe('ElasticV3ServerShipper', () => {
         }
 
         // From the start, it doesn't check connectivity because already confirmed
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
 
         // Wait a big time (1 minute should be enough, but for the sake of tests...)
         await jest.advanceTimersByTimeAsync(10 * MINUTES);
 
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
     });
 
@@ -353,29 +332,25 @@ describe('ElasticV3ServerShipper', () => {
         }
 
         // From the start, it doesn't check connectivity because already confirmed
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
 
         // Wait a big time (1 minute should be enough, but for the sake of tests...)
         await jest.advanceTimersByTimeAsync(10 * MINUTES);
 
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
 
       test('runs as soon as opt-in is set to true', () => {
         shipper.optIn(true);
 
         // From the start, it doesn't check connectivity because opt-in is not true
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
     });
 
@@ -391,29 +366,25 @@ describe('ElasticV3ServerShipper', () => {
         }
 
         // From the start, it doesn't check connectivity because already confirmed
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
 
         // Wait a big time (1 minute should be enough, but for the sake of tests...)
         await jest.advanceTimersByTimeAsync(10 * MINUTES);
 
-        expect(fetchMock).not.toHaveBeenCalledWith(
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
 
       test('runs as soon as opt-in is set to true', () => {
         shipper.optIn(true);
 
         // From the start, it doesn't check connectivity because opt-in is not true
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
     });
 
@@ -426,20 +397,16 @@ describe('ElasticV3ServerShipper', () => {
         const counter = firstValueFrom(shipper.telemetryCounter$);
         setLastBatchSent(Date.now() - 10 * SECONDS);
         await jest.advanceTimersByTimeAsync(1 * SECONDS); // Moving 1 second should be enough to trigger the logic
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          {
-            body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-            headers: {
-              'content-type': 'application/x-ndjson',
-              'x-elastic-cluster-id': 'UNKNOWN',
-              'x-elastic-stack-version': '1.2.3',
-            },
-            method: 'POST',
-            query: { debug: true },
-          }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+          headers: {
+            'content-type': 'application/x-ndjson',
+            'x-elastic-cluster-id': 'UNKNOWN',
+            'x-elastic-stack-version': '1.2.3',
+          },
+          method: 'POST',
+          query: { debug: true },
+        });
         await expect(counter).resolves.toMatchInlineSnapshot(`
           {
             "code": "Failed to fetch",
@@ -454,18 +421,14 @@ describe('ElasticV3ServerShipper', () => {
       test('connectivity check runs periodically', async () => {
         fetchMock.mockRejectedValueOnce(new Error('Failed to fetch'));
         await jest.advanceTimersByTimeAsync(1 * MINUTES);
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          2,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(2, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
         fetchMock.mockResolvedValueOnce({ ok: false });
         await jest.advanceTimersByTimeAsync(2 * MINUTES);
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          3,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(3, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
     });
 
@@ -482,11 +445,9 @@ describe('ElasticV3ServerShipper', () => {
       test('the following connectivity check clears the queue', async () => {
         fetchMock.mockRejectedValueOnce(new Error('Failed to fetch'));
         await jest.advanceTimersByTimeAsync(1 * MINUTES);
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
         // eslint-disable-next-line dot-notation
         expect(shipper['internalQueue'].length).toBe(0);
       });
@@ -494,11 +455,9 @@ describe('ElasticV3ServerShipper', () => {
       test('new events are not added to the queue', async () => {
         fetchMock.mockRejectedValueOnce(new Error('Failed to fetch'));
         await jest.advanceTimersByTimeAsync(1 * MINUTES);
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
         // eslint-disable-next-line dot-notation
         expect(shipper['internalQueue'].length).toBe(0);
 
@@ -510,20 +469,16 @@ describe('ElasticV3ServerShipper', () => {
       test('regains the connection', async () => {
         fetchMock.mockResolvedValueOnce({ ok: true });
         await jest.advanceTimersByTimeAsync(1 * MINUTES);
-        expect(fetchMock).toHaveBeenNthCalledWith(
-          1,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
         // eslint-disable-next-line dot-notation
         expect(shipper['firstTimeOffline']).toBe(null);
 
         await jest.advanceTimersByTimeAsync(10 * MINUTES);
-        expect(fetchMock).not.toHaveBeenNthCalledWith(
-          2,
-          'https://telemetry-staging.elastic.co/v3/send/test-channel',
-          { method: 'OPTIONS' }
-        );
+        expect(fetchMock).not.toHaveBeenNthCalledWith(2, 'https://telemetry-staging.elastic.co/v3/send/test-channel', {
+          method: 'OPTIONS',
+        });
       });
     });
   });
@@ -542,19 +497,16 @@ describe('ElasticV3ServerShipper', () => {
         expect(shipper['inFlightRequests$'].value).toBe(1);
       });
       await expect(shipper.flush()).resolves.toBe(undefined);
-      expect(fetchMock).toHaveBeenCalledWith(
-        'https://telemetry-staging.elastic.co/v3/send/test-channel',
-        {
-          body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-          headers: {
-            'content-type': 'application/x-ndjson',
-            'x-elastic-cluster-id': 'UNKNOWN',
-            'x-elastic-stack-version': '1.2.3',
-          },
-          method: 'POST',
-          query: { debug: true },
-        }
-      );
+      expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+        headers: {
+          'content-type': 'application/x-ndjson',
+          'x-elastic-cluster-id': 'UNKNOWN',
+          'x-elastic-stack-version': '1.2.3',
+        },
+        method: 'POST',
+        query: { debug: true },
+      });
     });
 
     test('calling flush multiple times does not keep hanging', async () => {

@@ -17,9 +17,7 @@ describe('loadSnippet', () => {
     // Define necessary window and document global variables for the tests
     jest
       .spyOn(global.document, 'getElementsByTagName')
-      .mockReturnValue([
-        { parentNode: { insertBefore: jest.fn() } },
-      ] as unknown as HTMLCollectionOf<Element>);
+      .mockReturnValue([{ parentNode: { insertBefore: jest.fn() } }] as unknown as HTMLCollectionOf<Element>);
   });
 
   it('should return the FullStory API', () => {

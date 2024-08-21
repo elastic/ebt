@@ -7,16 +7,16 @@
  */
 
 export function getParsedVersion(version: string): {
-  version_str: string;
-  version_major_int: number;
-  version_minor_int: number;
-  version_patch_int: number;
+  version: string;
+  version_major: number;
+  version_minor: number;
+  version_patch: number;
 } {
   const [major, minor, patch] = version.split('.');
   return {
-    version_str: version,
-    version_major_int: parseInt(major, 10),
-    version_minor_int: parseInt(minor, 10),
-    version_patch_int: parseInt(patch, 10),
+    version,
+    version_major: parseInt(major, 10),
+    version_minor: parseInt(minor, 10),
+    version_patch: parseInt(patch, 10),
   };
 }

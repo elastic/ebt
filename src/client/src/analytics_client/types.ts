@@ -168,10 +168,7 @@ export interface IAnalyticsClient {
    *
    * @track-adoption
    */
-  reportEvent: <EventTypeData extends object>(
-    eventType: EventType,
-    eventData: EventTypeData
-  ) => void;
+  reportEvent: <EventTypeData extends object>(eventType: EventType, eventData: EventTypeData) => void;
   /**
    * Registers the event type that will be emitted via the reportEvent API.
    * @param eventTypeOps The definition of the event type {@link EventTypeOpts}.

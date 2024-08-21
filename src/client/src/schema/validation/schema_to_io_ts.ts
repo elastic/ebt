@@ -68,9 +68,7 @@ function schemaValueToIoTs<Value>(value: SchemaValue<Value>): t.Mixed {
  * Loops through a list of [key, SchemaValue] tuples to convert them into a valid io-ts parameter to define objects.
  * @param entries Array of tuples [key, {@link SchemaValue}]. Typically, coming from Object.entries(SchemaObject).
  */
-function entriesToObjectIoTs<Value>(
-  entries: Array<[string, SchemaValue<Value>]>
-): Record<string, t.Mixed> {
+function entriesToObjectIoTs<Value>(entries: Array<[string, SchemaValue<Value>]>): Record<string, t.Mixed> {
   return Object.fromEntries(
     entries.map(([key, value]) => {
       try {
@@ -87,21 +85,14 @@ function entriesToObjectIoTs<Value>(
  * Converts a {@link SchemaObject} to the io-ts equivalent.
  * @param schemaObject The {@link SchemaObject} to parse.
  */
-function schemaObjectToIoTs<Value>(
-  schemaObject: SchemaObject<Value>
-): t.Type<Record<string, unknown>> {
-  const objectEntries: Array<[string, SchemaValue<unknown>]> = Object.entries(
-    schemaObject.properties
-  );
+function schemaObjectToIoTs<Value>(schemaObject: SchemaObject<Value>): t.Type<Record<string, unknown>> {
+  const objectEntries: Array<[string, SchemaValue<unknown>]> = Object.entries(schemaObject.properties);
 
   const requiredFields = objectEntries.filter(([key, { _meta }]) => _meta?.optional !== true);
   const optionalFields = objectEntries.filter(([key, { _meta }]) => _meta?.optional === true);
 
   return excess(
-    t.intersection([
-      t.interface(entriesToObjectIoTs(requiredFields)),
-      t.partial(entriesToObjectIoTs(optionalFields)),
-    ])
+    t.intersection([t.interface(entriesToObjectIoTs(requiredFields)), t.partial(entriesToObjectIoTs(optionalFields))])
   );
 }
 

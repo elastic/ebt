@@ -6,10 +6,7 @@
  * Side Public License, v 1.
  */
 
-import type {
-  AnalyticsClientInitContext,
-  IAnalyticsClient as AnalyticsClient,
-} from './src/analytics_client';
+import type { AnalyticsClientInitContext, IAnalyticsClient as AnalyticsClient } from './src/analytics_client';
 import { AnalyticsClient as AnalyticsClientClass } from './src/analytics_client';
 
 /**
@@ -38,13 +35,7 @@ export type {
   EventTypeOpts,
 } from './src/analytics_client';
 
-export type {
-  Event,
-  EventContext,
-  EventType,
-  TelemetryCounter,
-  TelemetryCounterType,
-} from './src/events';
+export type { Event, EventContext, EventType, TelemetryCounter, TelemetryCounterType } from './src/events';
 
 export type {
   RootSchema,

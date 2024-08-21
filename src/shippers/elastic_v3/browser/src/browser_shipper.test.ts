@@ -109,20 +109,17 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.optIn(true);
     const counter = firstValueFrom(shipper.telemetryCounter$);
     await jest.advanceTimersByTimeAsync(1000);
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
 {
   "code": "200",
@@ -146,20 +143,17 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.reportEvents(events);
     const counter = firstValueFrom(shipper.telemetryCounter$);
     await shipper.flush();
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
 {
   "code": "200",
@@ -193,20 +187,17 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.optIn(true);
     const counter = firstValueFrom(shipper.telemetryCounter$);
     shipper.shutdown();
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
 {
   "code": "200",
@@ -226,19 +217,16 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.reportEvents(events);
     shipper.optIn(true);
     await jest.advanceTimersByTimeAsync(1000);
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+    });
   });
 
   test('handles when the fetch request fails', async () => {
@@ -247,20 +235,17 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.optIn(true);
     const counter = firstValueFrom(shipper.telemetryCounter$);
     await jest.advanceTimersByTimeAsync(1000);
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
 {
   "code": "Failed to fetch",
@@ -282,20 +267,17 @@ describe('ElasticV3BrowserShipper', () => {
     shipper.optIn(true);
     const counter = firstValueFrom(shipper.telemetryCounter$);
     await jest.advanceTimersByTimeAsync(1000);
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://telemetry-staging.elastic.co/v3/send/test-channel',
-      {
-        body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
-        headers: {
-          'content-type': 'application/x-ndjson',
-          'x-elastic-cluster-id': 'UNKNOWN',
-          'x-elastic-stack-version': '1.2.3',
-        },
-        keepalive: true,
-        method: 'POST',
-        query: { debug: true },
-      }
-    );
+    expect(fetchMock).toHaveBeenCalledWith('https://telemetry-staging.elastic.co/v3/send/test-channel', {
+      body: '{"timestamp":"2020-01-01T00:00:00.000Z","event_type":"test-event-type","context":{},"properties":{}}\n',
+      headers: {
+        'content-type': 'application/x-ndjson',
+        'x-elastic-cluster-id': 'UNKNOWN',
+        'x-elastic-stack-version': '1.2.3',
+      },
+      keepalive: true,
+      method: 'POST',
+      query: { debug: true },
+    });
     await expect(counter).resolves.toMatchInlineSnapshot(`
 {
   "code": "400",

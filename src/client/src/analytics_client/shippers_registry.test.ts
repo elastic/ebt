@@ -28,9 +28,9 @@ describe('ShippersRegistry', () => {
       const shipper1 = shippersMock.createShipper();
       const shipper2 = shippersMock.createShipper();
       shippersRegistry.addGlobalShipper('testShipper', shipper1);
-      expect(() =>
-shippersRegistry.addGlobalShipper('testShipper', shipper2)
-).toThrowErrorMatchingInlineSnapshot(`"Shipper "testShipper" is already registered"`);
+      expect(() => shippersRegistry.addGlobalShipper('testShipper', shipper2)).toThrowErrorMatchingInlineSnapshot(
+        `"Shipper "testShipper" is already registered"`
+      );
     });
 
     test('adds multiple shippers with different names (even when the shipper implementation is the same)', () => {
@@ -50,9 +50,7 @@ shippersRegistry.addGlobalShipper('testShipper', shipper2)
       shippersRegistry.addGlobalShipper(shipperName, shipper);
       expect(shippersRegistry.allShippers.size).toBe(1);
 
-      const shippersForEventType = shippersRegistry.getShippersForEventType(
-        `RandomEvent${Date.now()}`
-      );
+      const shippersForEventType = shippersRegistry.getShippersForEventType(`RandomEvent${Date.now()}`);
       // eslint-disable-next-line dot-notation
       expect(shippersForEventType).toBe(shippersRegistry['globalShippers']);
       expect(shippersForEventType.size).toBe(1);
@@ -74,9 +72,7 @@ shippersRegistry.addGlobalShipper('testShipper', shipper2)
       shippersRegistry.addEventExclusiveShipper('testEvent', 'testShipper', shipper1);
       expect(() =>
         shippersRegistry.addEventExclusiveShipper('testEvent', 'testShipper', shipper2)
-      ).toThrowErrorMatchingInlineSnapshot(
-        `"testShipper is already registered for event-type testEvent"`
-      );
+      ).toThrowErrorMatchingInlineSnapshot(`"testShipper is already registered for event-type testEvent"`);
     });
 
     test('adds multiple shippers with different names (even when the shipper implementation is the same)', () => {
@@ -112,9 +108,7 @@ shippersRegistry.addGlobalShipper('testShipper', shipper2)
       expect(shippersForEventType.get(shipperName)).toBe(shipper);
 
       // No event-specific shipper found, returns global but no shippers found in global
-      const shippersForEventTypeNotFound = shippersRegistry.getShippersForEventType(
-        `RandomEvent${Date.now()}`
-      );
+      const shippersForEventTypeNotFound = shippersRegistry.getShippersForEventType(`RandomEvent${Date.now()}`);
       // eslint-disable-next-line dot-notation
       expect(shippersForEventTypeNotFound).toBe(shippersRegistry['globalShippers']);
       expect(shippersForEventTypeNotFound.size).toBe(0);
