@@ -3,6 +3,8 @@ coverage
 yarn-error.log
 .github
 .prettierrc.js
+renovate.json
+jest.config.js
 tsconfig.base.json
 tsconfig.jest.json
 tsconfig.json
