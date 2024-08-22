@@ -8,4 +8,4 @@ jest.config.js
 tsconfig.base.json
 tsconfig.jest.json
 tsconfig.json
-src/
+/src/
