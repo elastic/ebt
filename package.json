@@ -12,6 +12,9 @@
     "lint": "prettier **.{js,ts}",
     "test:unit": "jest",
     "prepare": "yarn clean && yarn lint -c && yarn test:unit && yarn build",
+    "preversion": "yarn",
+    "version": "git checkout -b $(node scripts/get_package_version) && git add .",
+    "postversion": "git push --set-upstream origin $(node scripts/get_package_version) && git push --tags",
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
