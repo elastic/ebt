@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@fullstory/snippet": "^2.0.4",
-    "@types/jest": "^29.5.13",
+    "@types/jest": "^29.5.14",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.has": "^4.5.9",
     "@types/node-fetch": "2.6.11",
