@@ -28,7 +28,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@fullstory/snippet": "^2.0.4",
+    "@fullstory/snippet": "^2.0.5",
     "@types/jest": "^29.5.14",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.has": "^4.5.9",
