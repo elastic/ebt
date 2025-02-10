@@ -15,9 +15,9 @@
   },
   "packageRules": [
     {
-      "matchDepPatterns": [".*"],
       "minimumReleaseAge": "7 days",
-      "enabled": true
+      "enabled": true,
+      "matchDepNames": ["/.*/"]
     }
   ]
 }
