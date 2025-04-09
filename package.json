@@ -20,7 +20,7 @@
   "dependencies": {
     "@babel/runtime": "^7.27.0",
     "fp-ts": "^2.16.9",
-    "io-ts": "^2.0.5",
+    "io-ts": "^2.2.22",
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
     "moment": "^2.30.1",
