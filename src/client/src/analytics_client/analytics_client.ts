@@ -115,6 +115,7 @@ export class AnalyticsClient implements IAnalyticsClient {
       event_type: eventType,
       context: this.context$.value,
       properties: eventData as unknown as Record<string, unknown>,
+      trace: this.initContext?.getTraceContext?.(),
     };
 
     this.initContext.logger.debug(`Report event "${eventType}"`, {

@@ -11,19 +11,29 @@ import { Subject, lastValueFrom, take, toArray } from 'rxjs';
 import { loggerMock, type MockedLogger } from './__mocks__/logger';
 import { AnalyticsClient } from './analytics_client';
 import { shippersMock } from '../shippers/mocks';
-import type { TelemetryCounter } from '../events';
+import type { TelemetryCounter, TraceContext } from '../events';
 import { ContextService } from './context_service';
 
 describe('AnalyticsClient', () => {
   let analyticsClient: AnalyticsClient;
   let logger: MockedLogger;
+  const traceContext: TraceContext = {
+    id: 'mocked-trace-id'
+  }
 
   beforeEach(() => {
     jest.useFakeTimers();
     logger = loggerMock.create();
+    let counter = 1;
     analyticsClient = new AnalyticsClient({
       logger,
       isDev: true,
+      getTraceContext: () => {
+        return {
+          ...traceContext,
+          id: `${traceContext.id ?? ''}-${counter++}`
+        }
+      },
     });
   });
 
@@ -165,18 +175,30 @@ describe('AnalyticsClient', () => {
           event_type: 'testEvent',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
         {
           context: {},
           event_type: 'testEvent',
           properties: { a_field: 'b' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
         {
           context: {},
           event_type: 'testEvent',
           properties: { a_field: 'c' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-3'
+          },
         },
       ]);
     });
@@ -215,6 +237,10 @@ describe('AnalyticsClient', () => {
           event_type: 'testEvent',
           properties: {},
           context: {},
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
       ]);
       expect(logger.warn).toHaveBeenCalledWith(
@@ -601,12 +627,20 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
         {
           context: {},
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
     });
@@ -635,12 +669,20 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
         {
           context: {},
           event_type: 'event-type-a',
           properties: { a_field: 'b' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-3'
+          },
         },
       ]);
       expect(reportEventsMock).toHaveBeenNthCalledWith(2, [
@@ -649,6 +691,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
 
@@ -823,6 +869,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
 
@@ -889,12 +939,20 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
         {
           context: {},
           event_type: 'event-type-a',
           properties: { a_field: 'b' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-3'
+          },
         },
       ]);
       expect(reportEventsMock1).toHaveBeenNthCalledWith(2, [
@@ -903,6 +961,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
       expect(reportEventsMock2).toHaveBeenCalledTimes(1);
@@ -912,6 +974,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
 
@@ -985,12 +1051,20 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
         {
           context: {},
           event_type: 'event-type-a',
           properties: { a_field: 'b' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-3'
+          },
         },
       ]);
       expect(reportEventsMock1).toHaveBeenNthCalledWith(2, [
@@ -999,6 +1073,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
       expect(reportEventsMock2).toHaveBeenCalledTimes(0);
@@ -1109,6 +1187,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'a' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-1'
+          },
         },
       ]);
       expect(reportEventsMock).toHaveBeenNthCalledWith(2, [
@@ -1117,6 +1199,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-b',
           properties: { b_field: 100 },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-2'
+          },
         },
       ]);
       expect(reportEventsMock).toHaveBeenNthCalledWith(3, [
@@ -1125,6 +1211,10 @@ describe('AnalyticsClient', () => {
           event_type: 'event-type-a',
           properties: { a_field: 'b' },
           timestamp: expect.any(String),
+          trace: {
+            ...traceContext,
+            id: traceContext.id + '-3'
+          },
         },
       ]);
 

@@ -120,4 +120,15 @@ export interface Event<Properties = Record<string, unknown>> {
    * The {@link EventContext} enriched during the processing pipeline.
    */
   context: EventContext;
+  /**
+   * The trace context.
+   */
+  trace?: TraceContext;
+}
+
+export type TraceContext = {
+    /**
+     * The trace ID.
+     */
+    id: string | undefined;
 }
