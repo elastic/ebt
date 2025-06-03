@@ -18,8 +18,8 @@ describe('AnalyticsClient', () => {
   let analyticsClient: AnalyticsClient;
   let logger: MockedLogger;
   const traceContext: TraceContext = {
-    id: 'mocked-trace-id'
-  }
+    id: 'mocked-trace-id',
+  };
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -31,8 +31,8 @@ describe('AnalyticsClient', () => {
       getTraceContext: () => {
         return {
           ...traceContext,
-          id: `${traceContext.id ?? ''}-${counter++}`
-        }
+          id: `${traceContext.id ?? ''}-${counter++}`,
+        };
       },
     });
   });
@@ -177,7 +177,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
         {
@@ -187,7 +187,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
         {
@@ -197,7 +197,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-3'
+            id: traceContext.id + '-3',
           },
         },
       ]);
@@ -239,7 +239,7 @@ describe('AnalyticsClient', () => {
           context: {},
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
       ]);
@@ -629,7 +629,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
         {
@@ -639,7 +639,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -671,7 +671,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
         {
@@ -681,7 +681,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-3'
+            id: traceContext.id + '-3',
           },
         },
       ]);
@@ -693,7 +693,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -871,7 +871,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -941,7 +941,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
         {
@@ -951,7 +951,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-3'
+            id: traceContext.id + '-3',
           },
         },
       ]);
@@ -963,7 +963,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -976,7 +976,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -1053,7 +1053,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
         {
@@ -1063,7 +1063,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-3'
+            id: traceContext.id + '-3',
           },
         },
       ]);
@@ -1075,7 +1075,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -1189,7 +1189,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-1'
+            id: traceContext.id + '-1',
           },
         },
       ]);
@@ -1201,7 +1201,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-2'
+            id: traceContext.id + '-2',
           },
         },
       ]);
@@ -1213,7 +1213,7 @@ describe('AnalyticsClient', () => {
           timestamp: expect.any(String),
           trace: {
             ...traceContext,
-            id: traceContext.id + '-3'
+            id: traceContext.id + '-3',
           },
         },
       ]);

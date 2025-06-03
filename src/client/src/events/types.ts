@@ -127,8 +127,8 @@ export interface Event<Properties = Record<string, unknown>> {
 }
 
 export type TraceContext = {
-    /**
-     * The trace ID.
-     */
-    id: string | undefined;
-}
+  /**
+   * The trace ID.
+   */
+  id: string | undefined;
+};
