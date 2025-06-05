@@ -13,7 +13,7 @@ import type { Observable } from 'rxjs';
 import type { Logger } from './logger_types';
 
 import type { IShipper } from '../shippers';
-import type { EventType, TelemetryCounter } from '../events';
+import type { EventType, TelemetryCounter, TraceContext } from '../events';
 import type { RootSchema } from '../schema';
 
 /**
@@ -28,6 +28,10 @@ export interface AnalyticsClientInitContext {
    * Application-provided logger.
    */
   logger: Logger;
+  /**
+   * A function to get trace.id
+   */
+  getTraceContext?: () => TraceContext | undefined;
 }
 
 /**
