@@ -1,6 +1,6 @@
 {
   "name": "@elastic/ebt",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Event-based telemetry for Elastic products",
   "repository": "git@github.com:elastic/ebt.git",
   "license": "SSPL-1.0 OR Elastic License 2.0",
