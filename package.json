@@ -4,7 +4,7 @@
   "description": "Event-based telemetry for Elastic products",
   "repository": "git@github.com:elastic/ebt.git",
   "license": "SSPL-1.0 OR Elastic License 2.0",
-  "main": "target/index.js",
+  "main": "index.js",
   "packageManager": "yarn@1.22.22",
   "scripts": {
     "build": "tsc --build",
