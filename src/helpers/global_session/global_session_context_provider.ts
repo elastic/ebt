@@ -28,7 +28,7 @@ export function registerGlobalSessionContextProvider({
   const sessionId$ = userId$.pipe(
     filter((userId): userId is string => !!userId),
     map((userId) => {
-      const startOfTheDay = moment().startOf('day').format('YYYY-MM-DD');
+      const startOfTheDay = moment().utc().startOf('day').format('YYYY-MM-DD');
 
       return sha256(`${organizationId}:${userId}:${startOfTheDay}`);
     })
