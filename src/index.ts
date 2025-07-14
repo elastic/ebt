@@ -47,6 +47,11 @@ export type {
   // Shippers
   IShipper,
 } from './client';
+
+// Helpers
+export type { GlobalSessionContextProviderOpts } from './helpers/global_session';
+
+// Shippers
 export type { ElasticV3ShipperOptions } from './shippers/elastic_v3/common';
 export type { ElasticV3BrowserShipper } from './shippers/elastic_v3/browser';
 export type { ElasticV3ServerShipper } from './shippers/elastic_v3/server';
