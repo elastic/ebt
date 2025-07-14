@@ -1,4 +1,4 @@
-import { merge, map, type Subject, of, filter, tap, distinctUntilChanged } from 'rxjs';
+import { merge, map, type Observable, of, filter, tap, distinctUntilChanged } from 'rxjs';
 import { sha256 } from 'js-sha256';
 import moment from 'moment';
 import type { AnalyticsClient } from '../../client';
@@ -11,7 +11,7 @@ export interface GlobalSessionContextProviderOpts {
   /**
    * Observable of the current user id
    */
-  userId$: Subject<string>;
+  userId$: Observable<string>;
   /**
    * Organization ID
    */
