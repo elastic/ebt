@@ -2,14 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { Observable, Subject } from 'rxjs';
-import { analyticsClientMock } from '../../client/src/mocks';
-import { registerGlobalSessionContextProvider } from './global_session_context_provider';
-
 jest.mock('moment', () => {
   const moment = jest.requireActual('moment');
   return () => moment('2022-01-01');
 });
+
+import { Observable, Subject } from 'rxjs';
+import { analyticsClientMock } from '../../client/src/mocks';
+import { registerGlobalSessionContextProvider } from './global_session_context_provider';
 
 describe('GlobalSessionContextProvider', () => {
   beforeEach(() => {
