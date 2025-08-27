@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { analyticsClientMock } from '../../client/src/mocks';
 import { registerGlobalSessionContextProvider } from './global_session_context_provider';
 
-jest.doMock('moment', () => {
+jest.mock('moment', () => {
   const moment = jest.requireActual('moment');
   return () => moment('2022-01-01');
 });
@@ -41,24 +41,24 @@ describe('GlobalSessionContextProvider', () => {
 
     userId$.next('user1');
     expect(returnedContexts).toEqual([
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
     ]);
     userId$.next('user2');
     expect(returnedContexts).toEqual([
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
-      { global_session: '1c4ef81ee026fa06aaab5f75c6e00d5b9a9457d69a56991e5a9f35e73753853d' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
+      { global_session: 'a7113826fe4a15c3110ec8b9fbec94d6452736489208f1ad12db449eca39582b' },
     ]);
     userId$.next('user1');
     expect(returnedContexts).toEqual([
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
-      { global_session: '1c4ef81ee026fa06aaab5f75c6e00d5b9a9457d69a56991e5a9f35e73753853d' },
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
+      { global_session: 'a7113826fe4a15c3110ec8b9fbec94d6452736489208f1ad12db449eca39582b' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
     ]);
     userId$.next('user1'); // shouldn't emit again
     expect(returnedContexts).toEqual([
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
-      { global_session: '1c4ef81ee026fa06aaab5f75c6e00d5b9a9457d69a56991e5a9f35e73753853d' },
-      { global_session: '3eeebecf40f7a6b0abdeb20bc665c7076c64a752d233c5b5216db5b667f47fdb' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
+      { global_session: 'a7113826fe4a15c3110ec8b9fbec94d6452736489208f1ad12db449eca39582b' },
+      { global_session: '8c2f5219d643c566dc04a842f3abd8699f947beb27e61b653f262efbad440a2c' },
     ]);
   });
 
@@ -75,24 +75,24 @@ describe('GlobalSessionContextProvider', () => {
 
     userId$.next('user1');
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
     userId$.next('user2');
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
-      { global_session: '407da607662092d2d2af767ca9d47f4f59d09add0da1c9994aaf66741adb7d25' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
+      { global_session: '69de85b592652a6679627112dba221c6d1645a905a2e225f90edf61440c17906' },
     ]);
     userId$.next('user1');
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
-      { global_session: '407da607662092d2d2af767ca9d47f4f59d09add0da1c9994aaf66741adb7d25' },
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
+      { global_session: '69de85b592652a6679627112dba221c6d1645a905a2e225f90edf61440c17906' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
     userId$.next('user1'); // shouldn't emit again
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
-      { global_session: '407da607662092d2d2af767ca9d47f4f59d09add0da1c9994aaf66741adb7d25' },
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
+      { global_session: '69de85b592652a6679627112dba221c6d1645a905a2e225f90edf61440c17906' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
   });
 
@@ -115,7 +115,7 @@ describe('GlobalSessionContextProvider', () => {
     userId$.next('user1');
     expect(returnedContexts).toEqual([
       { global_session: 'previously_stored_session_id' },
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
   });
 
@@ -123,7 +123,7 @@ describe('GlobalSessionContextProvider', () => {
     const analyticsClient = analyticsClientMock.create();
     const userId$ = new Subject<string>();
 
-    sessionStorage.setItem('ebt_global_session', 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf');
+    sessionStorage.setItem('ebt_global_session', '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d');
 
     registerGlobalSessionContextProvider({ analyticsClient, userId$, organizationId: 'org1' });
 
@@ -134,12 +134,12 @@ describe('GlobalSessionContextProvider', () => {
     });
 
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
 
     userId$.next('user1');
     expect(returnedContexts).toEqual([
-      { global_session: 'a863486481150581c0d6162764153126bc815b102af065076860ef8c5e45bddf' },
+      { global_session: '62e6bed1a90344f2400e1398f99d33b97df81ba3ef736643225fccef9e10d02d' },
     ]);
   });
 });
