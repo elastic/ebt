@@ -197,7 +197,7 @@ describe('ElasticV3ServerShipper', () => {
   test('sends when the queue overflows the 10kB leaky bucket one batch every 10s', async () => {
     expect.assertions(2 * 9 + 2);
 
-    shipper.reportEvents(new Array(1000).fill(events[0]));
+    shipper.reportEvents(new Array(10_000).fill(events[0]));
     shipper.optIn(true);
 
     // Due to the size of the test events, it matches 8 rounds.
@@ -220,23 +220,23 @@ describe('ElasticV3ServerShipper', () => {
         query: { debug: true },
       });
       await expect(counter).resolves.toMatchInlineSnapshot(`
-          {
-            "code": "200",
-            "count": 103,
-            "event_type": "test-event-type",
-            "source": "elastic_v3_server",
-            "type": "succeeded",
-          }
-        `);
+        {
+          "code": "200",
+          "count": 103,
+          "event_type": "test-event-type",
+          "source": "elastic_v3_server",
+          "type": "succeeded",
+        }
+      `);
       jest.advanceTimersToNextTimer();
     }
     // eslint-disable-next-line dot-notation
-    expect(shipper['internalQueue'].length).toBe(1000 - 9 * 103); // 73
+    expect(shipper['internalQueue'].length).toBe(10_000 - 9 * 103); // 9073
 
     // If we call it again, it should not enqueue all the events (only the ones to fill the queue):
     shipper.reportEvents(new Array(1000).fill(events[0]));
     // eslint-disable-next-line dot-notation
-    expect(shipper['internalQueue'].length).toBe(1000);
+    expect(shipper['internalQueue'].length).toBe(10_000);
   });
 
   test('handles when the fetch request fails', async () => {
