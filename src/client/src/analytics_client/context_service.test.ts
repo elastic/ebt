@@ -348,4 +348,76 @@ describe('ContextService', () => {
       { a_field: true }, // 2nd emission (the errored one does not spread)
     ]);
   });
+
+  test('handles adding, removing, and re-adding a context provider', async () => {
+    const contextA$ = new Subject<{ a_field: boolean }>();
+    const contextB$ = new Subject<{ b_field: number }>();
+
+    // Register first context provider
+    contextService.registerContextProvider({
+      name: 'contextProviderA',
+      schema: {
+        a_field: {
+          type: 'boolean',
+          _meta: {
+            description: 'a_field description',
+          },
+        },
+      },
+      context$: contextA$,
+    });
+
+    // Register second context provider for additional context
+    contextService.registerContextProvider({
+      name: 'contextProviderB',
+      schema: {
+        b_field: {
+          type: 'long',
+          _meta: {
+            description: 'b_field description',
+          },
+        },
+      },
+      context$: contextB$,
+    });
+
+    const globalContextPromise = lastValueFrom(globalContext$.pipe(take(6), toArray()));
+
+    // Emit initial values from both providers
+    contextA$.next({ a_field: true });
+    contextB$.next({ b_field: 1 });
+
+    // Remove context provider A
+    contextService.removeContextProvider('contextProviderA');
+
+    // Emit from B after A is removed
+    contextB$.next({ b_field: 2 });
+
+    // Re-register context provider A with a new subject
+    const contextANew$ = new Subject<{ a_field: boolean }>();
+    contextService.registerContextProvider({
+      name: 'contextProviderA',
+      schema: {
+        a_field: {
+          type: 'boolean',
+          _meta: {
+            description: 'a_field description',
+          },
+        },
+      },
+      context$: contextANew$,
+    });
+
+    // Emit from the new A provider
+    contextANew$.next({ a_field: false });
+
+    await expect(globalContextPromise).resolves.toEqual([
+      {}, // Original empty state
+      { a_field: true }, // A provider emits
+      { a_field: true, b_field: 1 }, // B provider emits, merged with A
+      { b_field: 1 }, // A provider removed, only B remains (with its last value)
+      { b_field: 2 }, // B provider emits new value
+      { a_field: false, b_field: 2 }, // New A provider emits
+    ]);
+  });
 });

@@ -68,6 +68,7 @@ export class ContextService {
    */
   public removeContextProvider(name: ContextProviderName) {
     this.contextProvidersSubscriptions.get(name)?.unsubscribe();
+    this.contextProvidersSubscriptions.delete(name);
     this.contextProvidersRegistry.delete(name);
     this.updateGlobalContext();
   }
