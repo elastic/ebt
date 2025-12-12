@@ -7,4 +7,4 @@
  */
 
 export type { ElasticV3ShipperOptions, BuildShipperHeaders, BuildShipperUrl, BuildShipperUrlOptions } from '../common';
-export { ElasticV3ServerShipper } from './src/server_shipper';
+export { ElasticV3ServerShipper, type ElasticV3ServerShipperOptions } from './src/server_shipper';
