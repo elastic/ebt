@@ -38,8 +38,30 @@ const SECOND = 1000;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 const KIB = 1024;
-const MAX_NUMBER_OF_EVENTS_IN_INTERNAL_QUEUE = 10_000;
-const MIN_TIME_SINCE_LAST_SEND = 10 * SECOND;
+
+/**
+ * Extended options for the {@link ElasticV3ServerShipper}.
+ * @public
+ * @remarks
+ * This interface extends {@link ElasticV3ShipperOptions} with an additional configuration to control the leaky bucket algorithm.
+ */
+export interface ElasticV3ServerShipperOptions extends ElasticV3ShipperOptions {
+  /**
+   * The maximum number of events to hold in the internal queue before dropping events.
+   * @defaultValue 10_000
+   */
+  maxQueueSize?: number;
+  /**
+   * The minimum time in milliseconds between two consecutive batch-shipments of events.
+   * @defaultValue 10 seconds
+   */
+  minTimeBetweenShipments?: number;
+  /**
+   * The maximum size of a single batch-shipment of events in bytes.
+   * @defaultValue 10 kB
+   */
+  maxPayloadSizePerShipment?: number;
+}
 
 /**
  * Elastic V3 shipper to use on the server side.
@@ -65,6 +87,10 @@ export class ElasticV3ServerShipper implements IShipper {
   private readonly url: string;
   private readonly buildHeaders: BuildShipperHeaders;
 
+  private readonly maxQueueSize: number;
+  private readonly minTimeBetweenShipments: number;
+  private readonly maxPayloadSizePerShipment: number;
+
   private lastBatchSent = Date.now();
 
   private clusterUuid: string = 'UNKNOWN';
@@ -85,7 +111,7 @@ export class ElasticV3ServerShipper implements IShipper {
    * @param initContext {@link AnalyticsClientInitContext}
    */
   constructor(
-    private readonly options: ElasticV3ShipperOptions,
+    private readonly options: ElasticV3ServerShipperOptions,
     private readonly initContext: AnalyticsClientInitContext
   ) {
     if (!options.buildShipperHeaders) {
@@ -98,6 +124,10 @@ export class ElasticV3ServerShipper implements IShipper {
     this.url = options.buildShipperUrl({
       channelName: options.channelName,
     });
+    this.maxQueueSize = options.maxQueueSize ?? 10_000;
+    this.minTimeBetweenShipments = options.minTimeBetweenShipments ?? 10 * SECOND;
+    this.maxPayloadSizePerShipment = options.maxPayloadSizePerShipment ?? 10 * KIB;
+
     this.setInternalSubscriber();
     this.checkConnectivity();
   }
@@ -138,9 +168,9 @@ export class ElasticV3ServerShipper implements IShipper {
       return;
     }
 
-    const freeSpace = MAX_NUMBER_OF_EVENTS_IN_INTERNAL_QUEUE - this.internalQueue.length;
+    const freeSpace = this.maxQueueSize - this.internalQueue.length;
 
-    // As per design, we only want store up-to 1000 events at a time. Drop anything that goes beyond that limit
+    // As per design, we only want store up-to 10_000 events at a time. Drop anything that goes beyond that limit
     if (freeSpace < events.length) {
       const toDrop = events.length - freeSpace;
       const droppedEvents = events.splice(-toDrop, toDrop);
@@ -238,9 +268,9 @@ export class ElasticV3ServerShipper implements IShipper {
   }
 
   private setInternalSubscriber() {
-    // Create an emitter that emits when MIN_TIME_SINCE_LAST_SEND have passed since the last time we sent the data
+    // Create an emitter that emits when this.minTimeBetweenShipments have passed since the last time we sent the data
     const minimumTimeSinceLastSent$ = interval(SECOND).pipe(
-      filter(() => Date.now() - this.lastBatchSent >= MIN_TIME_SINCE_LAST_SEND)
+      filter(() => Date.now() - this.lastBatchSent >= this.minTimeBetweenShipments)
     );
 
     merge(
@@ -311,13 +341,13 @@ export class ElasticV3ServerShipper implements IShipper {
    */
   private getEventsToSend(shouldFlush: boolean): Event[] {
     // If the internal queue is already smaller than the minimum batch size, or it's a flush action, do a direct assignment.
-    if (shouldFlush || this.getQueueByteSize(this.internalQueue) < 10 * KIB) {
+    if (shouldFlush || this.getQueueByteSize(this.internalQueue) < this.maxPayloadSizePerShipment) {
       return this.internalQueue.splice(0, this.internalQueue.length);
     }
-    // Otherwise, we'll feed the events to the leaky bucket queue until we reach 10kB.
+    // Otherwise, we'll feed the events to the leaky bucket queue until we reach this.maxPayloadSizePerShipment.
     const queue: Event[] = [];
     let queueByteSize = 0;
-    while (queueByteSize < 10 * KIB) {
+    while (queueByteSize < this.maxPayloadSizePerShipment) {
       const event = this.internalQueue.shift()!;
       queueByteSize += this.getEventSize(event);
       queue.push(event);
