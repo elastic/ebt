@@ -12,4 +12,5 @@ export const fetchMock = jest.fn().mockResolvedValue({
   text: () => Promise.resolve('{"status": "ok"}'),
 });
 
-jest.doMock('node-fetch', () => fetchMock);
+// Mock the global fetch
+global.fetch = fetchMock as unknown as typeof fetch;
